@@ -1,4 +1,9 @@
-# Olympus — recovered station register
+# Olympus — Arctic & Antarctic portal
+
+Project home: `C:\Users\david\Desktop\Projects\Olympus`
+(moved here 4 Sep 2026 from `C:\Users\david\Projects\olympus`).
+
+## The station register, recovered
 
 **Recovered 4 September 2026.** The `olympus/` repository built on 4 Sep was delivered as a
 tarball that was never saved to disk; it died with its container. The only surviving copy of the
@@ -38,3 +43,18 @@ logistics operators, not projects. Beyond EPICA was the only project filed as in
 `programmes` is populated on three records only. Back-filling it from the EU Polar Cluster roster
 — OCEAN:ICE, EPOC, POLARIN, CRYOSCOPE, LIQUIDICE, ICELINK, SnowPI and the rest — is real research
 and has not been attempted.
+
+
+## Published surfaces
+| Surface | URL |
+|---|---|
+| The Deck | https://claude.ai/code/artifact/fd6023e1-89a7-42a4-aec2-072c8f286c5f |
+| The Atlas — Station Network | https://claude.ai/code/artifact/a5b3f808-d2de-4e3e-9bc5-c3d7a684c4a4 |
+| The Named Ice | https://claude.ai/code/artifact/f24d74f7-e536-4906-9bf5-3b2bc90d71a3 |
+
+The Atlas share pin still points at a version published before the Beyond EPICA correction.
+Anyone holding that link sees the uncorrected record until the pin is moved.
+
+## Housekeeping
+`_to_delete/` holds git lock files this session could not remove (deletion is blocked on the
+session's mount). Delete that folder by hand; nothing depends on it.

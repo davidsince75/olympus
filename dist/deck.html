@@ -1,4 +1,3 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found]){display:none!important}</style></head><body>
 <title>Olympus Deck</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -180,7 +179,9 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .meter .fill{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,#0B7C8E,#0FA5BE);border-radius:1px}
 .meter .ref{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--ink2)}
 .mscale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--ink4);margin-top:4px;font-variant-numeric:tabular-nums}
-.stream{flex:1 1 auto;overflow-y:auto;min-height:0}
+.stream{flex:1 1 auto;overflow-y:auto;min-height:186px;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--line2) transparent}
+/* right rail: never clip its own contents — if the column is shorter than hero+gauge+stream+dispatch, it scrolls */
+.rrail{overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--line2) transparent}
 .evt{display:grid;grid-template-columns:3px 1fr;gap:0 10px;padding:9px 14px 9px 0;border-bottom:1px solid rgba(29,42,56,.5)}
 .evt .bar{background:var(--ink4);border-radius:0}
 .evt.crit .bar{background:var(--crit)} .evt.warn .bar{background:var(--warn)} .evt.info .bar{background:var(--s1)}
@@ -234,7 +235,8 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   .mapwrap{height:74vw;max-height:640px}
   .rail{max-height:340px}
   .foot{grid-template-columns:1fr}
-  .stream{max-height:300px}
+  .stream{max-height:300px;min-height:0}
+  .rrail{overflow:visible}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -346,7 +348,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
     </section>
 
     <!-- RIGHT RAIL -->
-    <section class="col">
+    <section class="col rrail">
       <div class="hero" id="heroMain">
         <div class="lab">Sea-ice extent · <span id="heroHemi">Southern</span> hemisphere</div>
         <div><span class="val" id="extVal" data-ex="extent">—.——</span><span class="unit">10⁶ km²</span></div>
@@ -380,7 +382,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
         <div style="margin-top:7px"><span class="prov" data-ex="rapid"><b>RAPID-MOCHA-WBTS 26.5°N array</b><span class="tag wait" id="amocTag">NO OBS</span></span></div>
       </div>
 
-      <div class="ph"><h2>Anomaly stream</h2><span class="prov" style="margin-right:8px" data-ex="sim_layer"><span class="tag sim">SIM</span></span><span class="n" id="evtn"></span></div>
+      <div class="ph"><h2>Anomaly stream</h2><span class="prov" style="margin-right:8px" data-ex="anom_stream"><b>Derived</b><span class="tag arch">MEAS</span></span><span class="n" id="evtn"></span></div>
       <div class="stream" id="stream"></div>
 
       <div class="dispatch dsp">
@@ -438,7 +440,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
     <div class="col note">
       <h3>What you are looking at</h3>
       <p>The sea-ice field is <b>measured</b>: every frame is a monthly composite of <code>EUMETSAT OSI SAF</code> concentration on the 25 km EASE2 grid. The extent is integrated from the same source cells that are drawn. The AMOC gauge is <b>measured</b> too — the RAPID array at 26.5°N, April 2004 to March 2024 — and reads <i>no observation</i> outside those dates rather than inventing one. The living layers &mdash; the imagery, the auroral oval, the <b data-ex="drift_pump">48-hour drift field</b> and the radar footprints &mdash; are <b>baked at build time and stamped with their own observation age</b>, because a published page cannot reach the network. Turn <b>LEARN</b> on and hover anything to find out what it is.</p>
-      <p>The <b>thermohaline conveyor on the globe is a schematic</b> — there is no measured global map of this circulation. Its path is drawn after the classic Broecker figure; only its speed is real, scaled by the observed monthly RAPID value. The deep-water formation sites and the RAPID and OSNAP lines are at their true locations. ITS_LIVE, Argo, the ground track and the anomaly stream remain illustrative and are marked <span class="prov" style="padding:0 4px"><span class="tag sim">SIM</span></span> wherever they appear.</p>
+      <p>The <b>thermohaline conveyor on the globe is a schematic</b> — there is no measured global map of this circulation. Its path is drawn after the classic Broecker figure; only its speed is real, scaled by the observed monthly RAPID value. The deep-water formation sites and the RAPID and OSNAP lines are at their true locations. ITS_LIVE, Argo and the ground track remain illustrative and are marked <span class="prov" style="padding:0 4px"><span class="tag sim">SIM</span></span> wherever they appear.</p>
     </div>
   </div>
 </div>
@@ -521,14 +523,7 @@ const LAYERS=[
  {id:"stn",  nm:"Station network", src:"COMNAP · SCAR master list", on:true, ex:"stn_deck"}
 ];
 
-const EVENTS=[
- {s:"crit",t:"Rift propagation",d:"Chasm-1 tip advanced 340 m since the previous pass.",m:"BRUNT ICE SHELF · 75.4°S 25.1°W · SENTINEL-1A IW",a:"14 min"},
- {s:"warn",t:"Ice-edge anomaly",d:"Bellingshausen sector edge 18% inside the 10-yr envelope for this day.",m:"70.2°S 85.0°W · NSIDC NASA-TEAM",a:"1 h 02"},
- {s:"warn",t:"Fresh anomaly",d:"Float 5906312 reports −0.14 PSU over 0–120 m against Weddell climatology.",m:"ARGO GDAC · CYCLE 148 · 64.9°S 41.2°W",a:"3 h 47"},
- {s:"info",t:"Acquisition gap",d:"No S1 coverage over the Amundsen Sea Embayment for 41 h.",m:"CDSE · ORBIT 51142 · IW/EW",a:"5 h 11"},
- {s:"info",t:"Velocity update",d:"Pine Island Glacier trunk mosaic refreshed; +1.9% on the 2024 annual mean.",m:"ITS_LIVE L3 · 120 m GRID",a:"9 h 30"},
- {s:"info",t:"Polynya opening",d:"Coastal polynya reopened east of the Ross ice front, 4,100 km².",m:"76.8°S 178.4°E · AMSR2 89 GHz",a:"14 h"}
-];
+
 
 /* ---------------- state ---------------- */
 const st={ S:true, mode:"S", t:0, playing:false, spd:1, sel:null, lay:{}, mapW:0, mapH:0,
@@ -1288,8 +1283,12 @@ osnap_e:{k:"ins",t:"OSNAP East",
 osnap_w:{k:"ins",t:"OSNAP West",
  b:"Across the mouth of the Labrador Sea — the section that was expected to carry the overturning and does not. It measures <b>3.0 ± 0.5 Sv</b> against 16.3 to the east. The array was built to watch the textbook site of deep convection and its main result was that the textbook was pointing at the wrong sea.",
  p:"Comm. Earth & Environment (2023), 71 months, Aug 2014 – Jun 2020. o-snap.org."},
+anom_stream:{k:"num",t:"How the anomaly stream is computed",
+ b:"Every card in the stream is computed in your browser from the record already on this page. The extent is the measured OSI SAF value for the month on screen, integrated on the EASE2 source grid at the 15% threshold. The baseline is the mean of that <b>same calendar month over 1991-2020</b>, taken from this same record so the comparison is internally consistent — a September is only ever compared with other Septembers. σ is the standard deviation of that calendar month over the same thirty years, which is what allows a departure to be graded rather than guessed at. Ranks count only observations of the same calendar month, and the record's real gaps (April–June 1986, December 1987) are skipped rather than bridged. <b>Nothing in this panel is fetched and nothing is invented.</b> It describes the month you are looking at, and it moves when you move the slider.",
+ p:"Derived in the browser from the OSI SAF monthly record carried by this page. No network."},
+
 sim_layer:{k:"ins",t:"This layer is illustrative",
- b:"ITS_LIVE velocity streaklines, Argo float positions, the satellite ground track and the anomaly stream are <b>drawn, not measured</b>. They show what the finished instrument would carry. They are marked SIM everywhere they appear, and no number on the deck is derived from them. Sentinel-1 used to be on this list and is not any more: those footprints are now real acquisitions, which is the only kind of progress this list is meant to record.",
+ b:"ITS_LIVE velocity streaklines, Argo float positions and the satellite ground track are <b>drawn, not measured</b>. They show what the finished instrument would carry. They are marked SIM everywhere they appear, and no number on the deck is derived from them. Sentinel-1 and the anomaly stream used to be on this list and are not any more: the footprints are real acquisitions, and the stream is now computed from the measured record. That is the only kind of progress this list is meant to record.",
  p:"Placeholder geometry. Measured: sea ice, AMOC, ice drift, SAR acquisitions and the imagery."},
 
 /* ---- numbers ---- */
@@ -1644,6 +1643,9 @@ function sync(){
     : st.mode==="PAIR" ? "EASE2 25 km → TWIN POLAR DISCS · TRUE AT ±45°"
     : st.S ? "EASE2 25 km → POLAR STEREOGRAPHIC DISC · TRUE AT 45°S"
            : "EASE2 25 km → POLAR STEREOGRAPHIC DISC · TRUE AT 45°N";
+
+  // the stream describes the month on screen, so it moves with it
+  try{ events(); }catch(e){}
 }
 
 /* ---------------- build UI ---------------- */
@@ -1690,12 +1692,156 @@ function stations(){
     el.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); go(); } });
   });
 }
-function events(){
-  $("#stream").innerHTML=EVENTS.map(e=>
-    `<div class="evt ${e.s}"><div class="bar"></div><div>
+/* ---------------- anomaly stream · derived, not invented ----------------
+   Every card below is computed in the browser from the record this page already
+   carries: OSI.hemi[h].ext is the measured monthly extent, integrated on the EASE2
+   source grid at the 15% threshold; OSI.hemi[h].clim is the mean of that same
+   calendar month over 1991-2020, taken from the same record so the comparison is
+   internally consistent. Nothing here is fetched, and nothing here is drawn.
+   The stream follows the time slider: it describes the month on screen. */
+
+let ANOM=null;
+function anomStats(){
+  if(ANOM) return ANOM;
+  const SD={}, BY={}, SPAN={};
+  for(const h of ["sh","nh"]){
+    const H=OSI.hemi[h];
+    const by=[], clim=[];
+    for(let m=0;m<12;m++){ by.push([]); clim.push([]); }
+    let y0=1e9, y1=-1e9;
+    for(let k=0;k<H.n;k++){
+      const t=YM0+H.ymo[k], y=Math.floor(t/12), m=t%12;
+      by[m].push([y, H.ext[k], k]);
+      if(y<y0) y0=y; if(y>y1) y1=y;
+      if(y>=1991 && y<=2020) clim[m].push(H.ext[k]);   // the stated baseline period
+    }
+    SD[h]=clim.map(v=>{
+      if(v.length<2) return 0;
+      const mu=v.reduce((a,b)=>a+b,0)/v.length;
+      return Math.sqrt(v.reduce((a,b)=>a+(b-mu)*(b-mu),0)/(v.length-1));
+    });
+    BY[h]=by; SPAN[h]=[y0,y1];
+  }
+  ANOM={SD:SD, byMonth:BY, span:SPAN};
+  return ANOM;
+}
+
+function ordinal(n){
+  const t=n%100; if(t>=11&&t<=13) return n+"th";
+  return n + (["th","st","nd","rd"][n%10] || "th");
+}
+function sgn(v,d){ return (v>=0?"+":"−") + Math.abs(v).toFixed(d); }
+
+// the frame this hemisphere is showing, honouring the record's real gaps
+function frameFor(h){
+  return (h===hemiKey()) ? monIdx() : frameAt(h, OSI.hemi[hemiKey()].ymo[monIdx()]);
+}
+
+function anomCards(h){
+  const S=anomStats(), H=OSI.hemi[h], k=frameFor(h);
+  const t=YM0+H.ymo[k], yy=Math.floor(t/12), mm=t%12;
+  const v=H.ext[k], c=H.clim[mm], sd=S.SD[h][mm];
+  const dv=v-c, pct=dv/c*100, z=sd>0?dv/sd:0;
+  const hemi = (h==="sh") ? "Antarctic" : "Arctic";
+  const when = MON[mm].toUpperCase()+" "+yy;
+  const r=recFor(h,k), ft=!!r[3];
+  const prod = "OSI SAF " + r[1];
+  const src = prod + " · EASE2 25 km · ≥15%";
+  const tag = ft ? ["ft","FT"] : ["arch","MEAS"];
+  const out=[];
+
+  // 1 — the departure itself, graded against the spread of the same calendar month
+  out.push({
+    s: z<=-2 ? "crit" : (z<=-1 || z>=2) ? "warn" : "info",
+    t: hemi+" extent anomaly",
+    d: v.toFixed(2)+" against a 1991–2020 "+MON[mm]+" mean of "+c.toFixed(2)+
+       " ×10⁶ km² — "+sgn(dv,2)+" ("+sgn(pct,1)+"%)"+
+       (sd>0 ? ", which is "+Math.abs(z).toFixed(1)+"σ "+(dv>=0?"above":"below")+
+               " that mean measured against the spread of "+MON[mm]+" over the same thirty years." : "."),
+    m: src, a: when, tag: tag });
+
+  // 2 — rank, counting only observations of the same calendar month
+  const ser=S.byMonth[h][mm].slice().sort((a,b)=>a[1]-b[1]);
+  const n=ser.length, pos=ser.findIndex(q=>q[2]===k)+1;
+  if(pos>0){
+    const lowR=pos, hiR=n-pos+1, low=lowR<=hiR, rk=low?lowR:hiR;
+    out.push({
+      s: rk<=3 ? (low?"crit":"warn") : rk<=10 ? "warn" : "info",
+      t: "Rank on the record",
+      d: ordinal(rk)+" "+(low?"lowest":"highest")+" "+MON[mm]+" of the "+n+
+         " in the record. Lowest "+ser[0][1].toFixed(2)+" ("+ser[0][0]+
+         "), highest "+ser[n-1][1].toFixed(2)+" ("+ser[n-1][0]+").",
+      m: n+" "+MON[mm]+" observations · "+S.span[h][0]+"–"+S.span[h][1],
+      a: when, tag: ["arch","DERIVED"] });
+  }
+
+  // 3 — how long the record has been on the same side of its own mean
+  const below = dv<0;
+  let run=0;
+  for(let q=k;q>=0;q--){
+    const mq=(YM0+H.ymo[q])%12;
+    if((H.ext[q] < H.clim[mq]) === below) run++; else break;
+  }
+  if(run>=2){
+    const i0=k-run+1, t0=YM0+H.ymo[i0];
+    // the record has real gaps; a run of frames is only a run of months if none fall inside it
+    const solid = (H.ymo[k]-H.ymo[i0]+1)===run;
+    out.push({
+      s: run>=24 ? "crit" : run>=12 ? "warn" : "info",
+      t: below ? "Consecutive months below the mean" : "Consecutive months above the mean",
+      d: run+(solid?" months in a row ":" consecutive observations ")+(below?"below":"above")+
+         " the 1991–2020 mean for their own calendar month, beginning "+
+         MON[t0%12]+" "+Math.floor(t0/12)+".",
+      m: solid ? "unbroken run of monthly observations"
+               : "consecutive observations · the record has gaps inside this span, skipped not bridged",
+      a: when, tag: ["arch","DERIVED"] });
+  }
+
+  // 4 — the same month one year earlier, if the record actually has it
+  const pk=frameAt(h, H.ymo[k]-12);
+  if(H.ymo[pk]===H.ymo[k]-12){
+    const pv=H.ext[pk], d1=v-pv, p1=d1/pv*100;
+    const flat = Math.abs(p1) < 0.5;
+    out.push({
+      s: Math.abs(p1)>=10 ? "warn" : "info",
+      t: flat ? "Year on year · level" : "Year on year",
+      d: flat
+        ? "Level with "+MON[mm]+" "+(yy-1)+" ("+pv.toFixed(2)+" → "+v.toFixed(2)+
+          " ×10⁶ km², "+sgn(d1,3)+"). A flat year against a depressed baseline is not a recovery."
+        : sgn(d1,2)+" ×10⁶ km² on "+MON[mm]+" "+(yy-1)+
+          " ("+pv.toFixed(2)+" → "+v.toFixed(2)+"), "+sgn(p1,1)+"%.",
+      m: "same calendar month, consecutive years",
+      a: when, tag: ["arch","DERIVED"] });
+  }
+
+  // 5 — which product this month comes from, and whether it can still be revised
+  out.push({
+    s: ft ? "warn" : "info",
+    t: ft ? "Provisional product" : "Product in use",
+    d: ft ? "This month comes from the interim fast-track stream, not the reprocessed "+
+            "climate data record. It is the most recent data available and it can be "+
+            "revised when the reprocessed record catches up."
+          : "This month comes from "+prod+". Extent is integrated on the source grid "+
+            "from the same cells that are drawn, at the 15% concentration threshold.",
+    m: prod, a: when, tag: tag });
+
+  return out;
+}
+
+let evtKey="";
+function events(force){
+  const hs = activeHemis();
+  const key = hs.join("+")+":"+monIdx();
+  if(!force && key===evtKey) return;          // don't rebuild while the slider is dragged
+  evtKey = key;
+  const cards = hs.reduce((a,h)=>a.concat(anomCards(h)), []);
+  $("#stream").innerHTML = cards.map(e=>
+    `<div class="evt ${e.s}" data-ex="anom_stream" tabindex="0"><div class="bar"></div><div>
        <div class="hd"><span class="ttl">${e.t}</span><span class="ago">${e.a}</span></div>
-       <div class="ds">${e.d}</div><div class="mt">${e.m}</div></div></div>`).join("");
-  $("#evtn").textContent=EVENTS.length+" open";
+       <div class="ds">${e.d}</div>
+       <div class="mt">${e.m} <span class="tag ${e.tag[0]}">${e.tag[1]}</span></div>
+     </div></div>`).join("");
+  $("#evtn").textContent = cards.length + " derived";
 }
 (function ramp(){
   const c=document.createElement("canvas"); c.width=118; c.height=7;
@@ -2011,5 +2157,3 @@ new ResizeObserver(()=>{ drawTL(); }).observe(tl);
 requestAnimationFrame(frame);
 })();
 </script>
-
-</body></html>

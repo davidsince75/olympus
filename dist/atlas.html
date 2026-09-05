@@ -352,7 +352,8 @@ const st = {
   fOpen:new Set(), fType:new Set(), fYear:false,
   net:new Set(["air","sea","traverse","cluster","joint","record"]),
   discs:[], w:0, h:0,
-  zoom:{S:1, N:1}, pan:{S:{x:0,y:0}, N:{x:0,y:0}}, drag:null
+  zoom:{S:1, N:1}, pan:{S:{x:0,y:0}, N:{x:0,y:0}}, drag:null,
+  ptrs:new Map(), pinch:null
 };
 
 /* ---------------- filtering ---------------- */
@@ -853,8 +854,28 @@ function hit(mx,my){
   for(const h of HOT){ const d=Math.hypot(h.x-mx,h.y-my); if(d<h.r && d<bd){ bd=d; best=h; } }
   return best;
 }
-map.addEventListener("mousemove", ev=>{
+map.addEventListener("pointermove", ev=>{
   const r = map.getBoundingClientRect(), mx = ev.clientX-r.left, my = ev.clientY-r.top;
+  if(st.ptrs.has(ev.pointerId)) st.ptrs.set(ev.pointerId, {x:mx, y:my});
+  // two contacts: zoom about the midpoint, and pan by the midpoint's travel
+  if(st.pinch && st.ptrs.size>=2){
+    const p = [...st.ptrs.values()].slice(0,2);
+    const nd = Math.hypot(p[0].x-p[1].x, p[0].y-p[1].y);
+    const cx = (p[0].x+p[1].x)/2, cy = (p[0].y+p[1].y)/2;
+    const key = st.pinch.S?"S":"N";
+    let dd = discFor(st.pinch.S);
+    if(dd){
+      st.pan[key].x -= (cx-st.pinch.cx)/(dd.r*dd.z);
+      st.pan[key].y += (cy-st.pinch.cy)/(dd.r*dd.z);
+      layout(); draw();
+      dd = discFor(st.pinch.S);
+      if(dd && st.pinch.d>0 && nd>0) zoomAt(dd, nd/st.pinch.d, cx, cy);
+    }
+    st.pinch.d = nd; st.pinch.cx = cx; st.pinch.cy = cy;
+    $("#tip").style.opacity = 0;
+    ev.preventDefault();
+    return;
+  }
   if(st.drag){
     const dx = mx - st.drag.mx, dy = my - st.drag.my;
     st.drag.moved += Math.abs(dx)+Math.abs(dy);
@@ -864,6 +885,9 @@ map.addEventListener("mousemove", ev=>{
     map.style.cursor="grabbing"; $("#tip").style.opacity=0;
     layout(); draw(); return;
   }
+  // a touch contact has no hover state; the tooltip and the cursor lat/lon
+  // readout are for pointing devices only
+  if(ev.pointerType === "touch"){ return; }
   const h = hit(mx,my), tip = $("#tip");
   if(h){
     const o = BY.get(h.id);
@@ -884,7 +908,7 @@ map.addEventListener("mousemove", ev=>{
     }
   }
 });
-map.addEventListener("mouseleave", ()=>{ $("#tip").style.opacity=0; });
+map.addEventListener("pointerleave", ()=>{ $("#tip").style.opacity=0; });
 
 map.addEventListener("wheel", ev=>{
   ev.preventDefault();
@@ -894,16 +918,46 @@ map.addEventListener("wheel", ev=>{
 
 map.addEventListener("pointerdown", ev=>{
   const r = map.getBoundingClientRect(), mx=ev.clientX-r.left, my=ev.clientY-r.top;
-  st.drag = {mx, my, moved:0, d:discAt(mx), px:0, py:0};
-  map.setPointerCapture(ev.pointerId);
+  st.ptrs.set(ev.pointerId, {x:mx, y:my});
+  if(st.ptrs.size === 1){
+    st.drag = {mx, my, ox:mx, oy:my, moved:0, d:discAt(mx), px:0, py:0};
+  } else if(st.ptrs.size === 2){
+    // a second contact means pinch, not pan
+    st.drag = null;
+    const p = [...st.ptrs.values()].slice(0,2);
+    const cx = (p[0].x+p[1].x)/2, cy = (p[0].y+p[1].y)/2;
+    const d0 = discAt(cx);
+    st.pinch = {d:Math.hypot(p[0].x-p[1].x, p[0].y-p[1].y), cx, cy, S:d0?d0.S:false};
+    $("#tip").style.opacity = 0;
+  }
+  try { map.setPointerCapture(ev.pointerId); } catch(e){}
 });
 map.addEventListener("pointerup", ev=>{
   const r = map.getBoundingClientRect(), mx=ev.clientX-r.left, my=ev.clientY-r.top;
-  const moved = st.drag ? st.drag.moved : 99;
+  const wasPinch = !!st.pinch;
+  st.ptrs.delete(ev.pointerId);
+  try { map.releasePointerCapture(ev.pointerId); } catch(e){}
+  if(st.ptrs.size < 2) st.pinch = null;
+  if(st.ptrs.size > 0){
+    // a contact lifted out of a pinch: re-seat the survivor as a pan origin.
+    // noTap so that lifting it cannot be read as a selection.
+    const p = [...st.ptrs.values()][0];
+    st.drag = {mx:p.x, my:p.y, ox:p.x, oy:p.y, moved:0, noTap:true, d:discAt(p.x), px:0, py:0};
+    return;
+  }
+  const dr = st.drag;
   st.drag = null;
-  if(moved < 4){ const h = hit(mx,my); select(h ? h.id : null); }
+  if(wasPinch || !dr || dr.noTap) return;
+  // tap vs drag on displacement from the down point, not path length: a
+  // fingertip wanders more than a mouse and accumulates jitter either way
+  const lim = (ev.pointerType === "touch") ? 10 : 4;
+  if(Math.hypot(mx-dr.ox, my-dr.oy) < lim){ const h = hit(mx,my); select(h ? h.id : null); }
 });
-map.addEventListener("pointercancel", ()=>{ st.drag=null; });
+map.addEventListener("pointercancel", ev=>{
+  if(ev && ev.pointerId != null) st.ptrs.delete(ev.pointerId); else st.ptrs.clear();
+  if(st.ptrs.size < 2) st.pinch = null;
+  if(st.ptrs.size === 0) st.drag = null;
+});
 
 /* ---------------- routing ---------------- */
 function select(id, push){

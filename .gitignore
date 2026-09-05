@@ -1,2 +1,10 @@
 _to_delete/
 *.lock
+
+node_modules/
+*.bak
+atlas.stripped.html
+
+node_modules/
+*.bak
+atlas.stripped.html

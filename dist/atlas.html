@@ -196,6 +196,38 @@ canvas#map{position:absolute;inset:0;width:100%;height:100%;display:block;cursor
 .bar{display:flex;height:7px;border-radius:1px;overflow:hidden;min-width:74px;background:var(--line)}
 .bar i{height:100%}
 
+
+/* ---------- the learning layer ---------- */
+.learn{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);cursor:pointer;user-select:none;
+  border:1px solid var(--line2);border-radius:2px;padding:4px 9px}
+.learn .sw{width:22px;height:12px;border-radius:7px;background:var(--line2);position:relative;transition:background .15s}
+.learn .sw::after{content:"";position:absolute;top:2px;left:2px;width:8px;height:8px;border-radius:50%;
+  background:var(--ink3);transition:transform .15s,background .15s}
+.learn[aria-pressed="true"]{border-color:var(--s1);color:var(--ice)}
+.learn[aria-pressed="true"] .sw{background:rgba(15,165,190,.5)}
+.learn[aria-pressed="true"] .sw::after{transform:translateX(10px);background:var(--ice)}
+.exbox{position:fixed;z-index:60;max-width:330px;background:rgba(9,16,23,.97);border:1px solid var(--line2);
+  border-radius:3px;padding:10px 12px 9px;box-shadow:0 10px 30px rgba(0,0,0,.55);pointer-events:none}
+.exh{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.exh b{font-family:var(--disp);font-size:13px;letter-spacing:.03em;color:var(--ink)}
+.exk{font-family:var(--disp);font-size:8.5px;letter-spacing:.16em;padding:1px 4px;border-radius:1px}
+.k-obj{background:rgba(15,165,190,.18);color:#7FD5E4}
+.k-ins{background:rgba(155,118,220,.18);color:#C3AEEE}
+.k-num{background:rgba(200,128,47,.18);color:#E8B77E}
+.k-mech{background:rgba(79,158,106,.20);color:#8FD4AC}
+.exb{font-size:11.5px;line-height:1.55;color:var(--ink2)}
+.exb b{color:var(--ink);font-weight:600}
+.exp{margin-top:7px;padding-top:6px;border-top:1px solid var(--line);font-family:var(--mono);font-size:9px;
+  line-height:1.45;color:var(--ink4)}
+body.learning [data-ex]{cursor:help}
+.exidx{padding:2px 10px 10px;flex:0 0 auto;max-height:38%;overflow-y:auto;border-top:1px solid var(--line)}
+.exidx .grp{font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink4);margin:9px 4px 4px}
+.exidx button{display:block;width:100%;text-align:left;font-size:11.5px;line-height:1.35;color:var(--ink3);
+  padding:3px 5px;border-radius:2px;border-left:2px solid transparent}
+.exidx button:hover,.exidx button:focus-visible{color:var(--ice);background:var(--panel2);border-left-color:var(--s1)}
+
 .foot{background:var(--panel);padding:9px 16px;flex:0 0 auto;display:flex;gap:22px;align-items:center;font-family:var(--mono);font-size:9.5px;color:var(--ink4);letter-spacing:.04em}
 .foot a{color:var(--ink3);border-bottom-color:var(--line2)}
 .empty{padding:22px 17px;color:var(--ink4);font-size:12px;line-height:1.6}
@@ -222,27 +254,30 @@ canvas#map{position:absolute;inset:0;width:100%;height:100%;display:block;cursor
       </svg>
       <div><h1>Station Network</h1><div class="sub">Olympus · Atlas</div></div>
     </div>
-    <nav class="xnav" aria-label="Olympus surfaces">
+    <nav class="xnav" aria-label="Olympus surfaces" data-ex="surfaces">
   <a href="https://claude.ai/code/artifact/fd6023e1-89a7-42a4-aec2-072c8f286c5f"    data-s="deck">Deck</a>
   <a href="https://claude.ai/code/artifact/a5b3f808-d2de-4e3e-9bc5-c3d7a684c4a4"   data-s="atlas" aria-current="page">Stations</a>
   <a href="https://claude.ai/code/artifact/f24d74f7-e536-4906-9bf5-3b2bc90d71a3" data-s="culture">Named Ice</a>
 </nav>
 
+    <button class="learn" id="learnBtn" aria-pressed="false" style="margin-left:auto"><span class="sw"></span>Learn</button>
     <div class="hstat">
-      <div><b id="hsFac">—</b>facilities</div>
-      <div><b id="hsNat">—</b>operators</div>
-      <div><b id="hsLink">—</b>links</div>
-      <div><b id="hsOpen">—</b>with open data</div>
+      <div data-ex="counts"><b id="hsFac">—</b>facilities</div>
+      <div data-ex="operators"><b id="hsNat">—</b>operators</div>
+      <div data-ex="edges"><b id="hsLink">—</b>links</div>
+      <div data-ex="openness"><b id="hsOpen">—</b>with open data</div>
     </div>
   </header>
 
   <div class="body">
     <!-- LEFT -->
     <section class="col">
-      <div class="srch"><input id="q" type="search" placeholder="search station, operator, region…" autocomplete="off"></div>
+      <div class="srch" data-ex="search"><input id="q" type="search" placeholder="search station, operator, region…" autocomplete="off"></div>
       <div class="chips" id="filters"></div>
       <div class="ph"><h2>Facilities</h2><span class="n" id="listN"></span></div>
       <div class="scroll" id="list"></div>
+      <div class="ph" id="exIndexHead" hidden><h2>Explainers</h2><span class="n" id="exCount"></span></div>
+      <div class="exidx" id="exIndex" hidden></div>
     </section>
 
     <!-- MAP -->
@@ -252,15 +287,15 @@ canvas#map{position:absolute;inset:0;width:100%;height:100%;display:block;cursor
         <div class="hud">
           <div class="tl">
             <div class="modebar" id="modeBar" role="group" aria-label="View">
-              <button data-mode="S" aria-pressed="true">Antarctic</button>
-              <button data-mode="N" aria-pressed="false">Arctic</button>
-              <button data-mode="BOTH" aria-pressed="false">Both</button>
+              <button data-mode="S" aria-pressed="true" data-ex="comnap">Antarctic</button>
+              <button data-mode="N" aria-pressed="false" data-ex="arctic_register">Arctic</button>
+              <button data-mode="BOTH" aria-pressed="false" data-ex="both_poles">Both</button>
             </div>
             <div class="modebar" id="netBar" role="group" aria-label="Network layers"></div>
             <div style="display:flex;gap:6px;align-items:center">
               <div class="modebar" id="liveBar" role="group" aria-label="Live layers"></div>
               <div class="modebar" id="baseBar" role="group" aria-label="Base imagery"></div>
-              <div class="modebar" id="driftX" role="group" aria-label="Drift vector length">
+              <div class="modebar" id="driftX" role="group" aria-label="Drift vector length" data-ex="drift_true_length">
                 <button data-x="1" aria-pressed="true">×1</button>
                 <button data-x="5" aria-pressed="false">×5</button>
                 <button data-x="15" aria-pressed="false">×15</button>
@@ -269,18 +304,18 @@ canvas#map{position:absolute;inset:0;width:100%;height:100%;display:block;cursor
             <div class="fresh" id="fresh"></div>
           </div>
           <div class="tr">
-            <div class="readout" id="proj">—</div>
+            <div class="readout" id="proj" data-ex="projection">—</div>
             <div class="readout" id="cursor"><b>CURSOR</b> ——.—° ——.—°</div>
           </div>
           <div class="bl">
             <div class="lgd">
-              <div class="t">Public presence</div>
-              <span><i class="d" style="background:var(--open)"></i>Open — live feed or open data</span>
-              <span><i class="d" style="background:var(--partial)"></i>Partial — national portal or on request</span>
-              <span><i class="d" style="background:var(--minimal)"></i>Minimal — operator page only</span>
-              <span><i class="d" style="background:var(--opaque)"></i>Opaque — nothing public</span>
-              <span><i class="d" style="background:none;border:1.5px solid var(--ink2);box-sizing:border-box"></i>Gateway port</span>
-              <span><i class="d" style="background:none;border:1.5px solid var(--ember);border-radius:0;transform:rotate(45deg)"></i>Heritage site</span>
+              <div class="t" data-ex="openness">Public presence</div>
+              <span data-ex="open_level"><i class="d" style="background:var(--open)"></i>Open — live feed or open data</span>
+              <span data-ex="partial_level"><i class="d" style="background:var(--partial)"></i>Partial — national portal or on request</span>
+              <span data-ex="minimal_level"><i class="d" style="background:var(--minimal)"></i>Minimal — operator page only</span>
+              <span data-ex="opaque_level"><i class="d" style="background:var(--opaque)"></i>Opaque — nothing public</span>
+              <span data-ex="gateway"><i class="d" style="background:none;border:1.5px solid var(--ink2);box-sizing:border-box"></i>Gateway port</span>
+              <span data-ex="heritage"><i class="d" style="background:none;border:1.5px solid var(--ember);border-radius:0;transform:rotate(45deg)"></i>Heritage site</span>
             </div>
           </div>
           <div class="br" style="display:flex;flex-direction:column;gap:5px;align-items:flex-end">
@@ -288,7 +323,7 @@ canvas#map{position:absolute;inset:0;width:100%;height:100%;display:block;cursor
               <button data-z="out">−</button><button data-z="in">+</button><button data-z="reset">Reset</button>
             </div>
             <div class="readout" id="zoomR">ZOOM 1.0×</div>
-            <div class="readout" id="scaleR">—</div>
+            <div class="readout" id="scaleR" data-ex="scale">—</div>
           </div>
           <div class="tip" id="tip"></div>
         </div>
@@ -303,8 +338,8 @@ canvas#map{position:absolute;inset:0;width:100%;height:100%;display:block;cursor
   </div>
 
   <div class="foot">
-    <span id="fprov">—</span>
-    <span style="margin-left:auto">Routes are schematic great circles between published positions, not flown or sailed tracks.</span>
+    <span id="fprov" data-ex="comnap">—</span>
+    <span style="margin-left:auto" data-ex="routes">Routes are schematic great circles between published positions, not flown or sailed tracks.</span>
   </div>
 </div>
 
@@ -346,6 +381,141 @@ for(const e of NET.edges){
   ADJ.get(e.a).push({other:e.b, kind:e.kind, label:e.label});
   ADJ.get(e.b).push({other:e.a, kind:e.kind, label:e.label});
 }
+
+
+/* ============================ the learning layer ============================
+   Same model as the deck: four kinds, one popup, and a provenance line on every
+   entry — the rule the whole platform is built on. Two differences here. Hover
+   targets sit on the chrome and never on the map, because the map's hover and
+   click already belong to the stations. And a small set of anchored callouts is
+   drawn on the map when LEARN is on, to say what the network shows rather than
+   what a word means.                                                          */
+
+const EXKIND = {obj:"OBJECT", ins:"INSTRUMENT", num:"NUMBER", mech:"FINDING"};
+const EXPL = {
+
+/* ---- what the register is ---- */
+counts:{k:"num",t:"166 facilities",
+ b:"<b>114 in the Antarctic, 52 in the Arctic.</b> Not every building on the ice — every facility that has a position, an operator and a reason to be counted: year-round bases, summer camps, observatories, runways, depots, drifting platforms and the support bases that feed them. Gateway ports and heritage huts are counted separately and drawn differently, because they are not facilities.",
+ p:"Antarctic from the COMNAP master list plus researched additions; Arctic compiled. See the provenance line in the footer."},
+operators:{k:"num",t:"40 operators",
+ b:"Operators, not countries. Most are national programmes, but not all: <b>ALCI</b> and <b>Antarctic Logistics &amp; Expeditions</b> are commercial, the <b>International Polar Foundation</b> is a charity, and several facilities are run by two programmes together. The count went from 41 to 40 when a research project that had been filed as an operator was removed.",
+ p:"Distinct operator values across the register. The correction is described under Project, not operator."},
+openness:{k:"num",t:"The axis nobody else publishes",
+ b:"Every facility is scored on one question: <b>can a curious person outside the institution see any of it?</b> Not whether it does good science — that is a different question and other people already answer it. <b>48 open · 35 partial · 67 minimal · 16 opaque.</b> The largest group is minimal, which is the finding: most of what happens on the ice is invisible from outside.",
+ p:"Scored per facility against the scale in the register's meta.openness_scale."},
+open_level:{k:"obj",t:"Open",
+ b:"A public presence at the level of the station itself, <b>and</b> either a live feed or machine-readable data you can actually fetch. Forty-eight facilities. Zackenberg, which publishes thirty years of one valley's ecology, is the type specimen.",
+ p:"Both conditions must hold. A handsome page with nothing behind it is Partial."},
+partial_level:{k:"obj",t:"Partial",
+ b:"There is a public presence, and the data exists, but it reaches you through a national portal or on request rather than from the station. Thirty-five facilities. This is the most common shape of a well-run programme that has not thought about the public as an audience.",
+ p:"Scored where data is reachable but not directly, or where the station page is the operator's."},
+minimal_level:{k:"obj",t:"Minimal",
+ b:"An operator-level presence only — you can establish that the place exists and who runs it, and little else specific to it. <b>Sixty-seven facilities, the largest single group.</b> Not secrecy, mostly: just nobody whose job it is.",
+ p:"The modal state of the register, which is itself the point."},
+opaque_level:{k:"obj",t:"Opaque",
+ b:"No meaningful public presence in a language a general reader can reach. Sixteen facilities. This is a statement about <b>reachability, not about worth</b> — several of these are serious scientific stations. But if you wanted to know what one of them measured this year, you could not find out.",
+ p:"Scored on public reachability alone. No judgement of the science is implied or intended."},
+gateway:{k:"obj",t:"Gateway ports",
+ b:"Eleven cities, drawn as open rings because they are not on the ice. Almost everything and everyone that reaches Antarctica passes through one of them — Hobart, Christchurch, Punta Arenas, Ushuaia, Cape Town. They are the real chokepoints of the continent, and they are all in the temperate world.",
+ p:"Compiled from national programme logistics publications."},
+heritage:{k:"obj",t:"Heritage sites",
+ b:"Thirteen, drawn as diamonds. Huts and sites protected under the Antarctic Treaty system, several of them still standing within sight of a working station — <b>Scott's Discovery hut is 300 m from McMurdo's dormitories</b>, with the seal blubber still in the stove. The continent's history and its present are usually the same view.",
+ p:"Antarctic Treaty Historic Sites and Monuments, selected."},
+facility_vs_programme:{k:"obj",t:"Project, not operator",
+ b:"A record here describes <b>a place and who runs it</b>. A research project that works at that place goes in <i>Programmes hosted</i>, never in the operator or the nation. The rule exists because it was broken: Beyond EPICA — an EU-funded project, one of about twenty in the EU Polar Cluster — had been filed as the operator and the nation of Little Dome C, which is in fact a French and Italian camp 35 km from Concordia.",
+ p:"Carried in the data as meta.schema_note, so it survives a rebuild by anyone."},
+joint:{k:"obj",t:"Shared facilities",
+ b:"Some stations are run by two programmes at once, and the register records both. <b>AWIPEV</b> is a German and a French station merged into one building; <b>Concordia</b> and the <b>Little Dome C</b> drill camp are both French and Italian. In the Arctic this is rarer than it sounds, and in the Antarctic it is one of the few things the Treaty system reliably produces.",
+ p:"The joint field on each record; drawn as a joint edge on the network."},
+
+/* ---- where it comes from ---- */
+comnap:{k:"ins",t:"The master list, and its date",
+ b:"The Antarctic half rests on the <b>COMNAP Antarctic Facilities Master List, 2017 edition</b>, and every record says so. That is the weakest thing in this dataset and it is stamped rather than hidden: eight years of openings, closures and rebuilds have happened since. Post-2017 facilities were researched one at a time — Qinling, Union Glacier, Novo Runway, Troll Airfield, Perseus and Little Dome C.",
+ p:"COMNAP master list, 2017 edition, redistributed with Quantarctica 3. Asking COMNAP for a current edition is an open action."},
+arctic_register:{k:"ins",t:"The Arctic list had to be built",
+ b:"There is <b>no COMNAP for the north</b>. No single body keeps a register of Arctic research facilities, because there is no single treaty and eight sovereign states own the ground. So these 52 were selected — for bearing on the cryosphere — from operator and programme publications: the Ny-Ålesund cluster, the Greenland ice-sheet camps, the Canadian High Arctic observatories, the Siberian shelf stations, the Fennoscandian observatories and the drifting platform.",
+ p:"Compiled. Positions to station-site precision from operator and programme publications, 2026."},
+link_rot:{k:"ins",t:"Every link was tried",
+ b:"Before publication each outbound URL was fetched and the result recorded: <b>96 verified live, 4 blocked to robots, 5 unverifiable from the build host</b>. Dead links are shown as dead rather than left looking healthy. Eight of the first 118 were already wrong when first checked, which is roughly a 7% annual rot rate — so this check has to be scheduled, not done once.",
+ p:"Recorded in the data as meta.links_checked and per record as link_status."},
+positions:{k:"ins",t:"How exact a position is",
+ b:"Antarctic coordinates come from the master list and are good to the site. Arctic coordinates are compiled from operator publications and are good to the <b>station site, not to the building</b> — at Ny-Ålesund nine facilities share three decimal places of longitude because they share a village. Each record carries its own provenance for geometry, population and narrative separately, because they have different reliability.",
+ p:"The prov block on every record: geo, demog and narrative, sourced independently."},
+edges:{k:"ins",t:"Six kinds of line",
+ b:"Kept separate because they mean different things. <b>Air</b> (54) and <b>sea</b> (22) are how people and cargo arrive. <b>Traverse</b> (13) is overland by tractor train. <b>Cluster</b> (37) means near enough to walk or ski between. <b>Joint</b> (4) means one facility run by two programmes. <b>Record</b> (12) links places that share a scientific series rather than any physical route.",
+ p:"142 edges. Compiled from operator logistics publications and programme documentation."},
+routes:{k:"ins",t:"The lines are not tracks",
+ b:"Every route is drawn as a <b>schematic great circle</b> between two published positions. No flight actually follows it: aircraft route around weather, fuel and the blue-ice runway that happens to be usable that week, and ships follow the ice edge. The line asserts a connection, never a path.",
+ p:"Drawn geometry, stated in the footer of every view."},
+search:{k:"ins",t:"What the search sees",
+ b:"Name, official name, operator, nation, region, locality, what the facility observes, and the programmes it hosts — all of it, in one haystack. So <b>ozone</b> finds the stations that measure it and <b>Ny-Ålesund</b> finds all nine at once, and neither is a special case anybody coded.",
+ p:"One flattened string per record, rebuilt when the register is."},
+projection:{k:"ins",t:"The projection, stated honestly",
+ b:"A <b>spherical polar stereographic disc normalised at 45°</b>. It is not EPSG:3031 or EPSG:3413, and it does not claim to be. That is why the satellite imagery here is resampled through this surface's own inverse projection rather than drawn as published tiles — alignment by construction instead of by coincidence. Drawing the real tiles is a projection change and it has not been made.",
+ p:"proj() in this page. The coastlines and every station position pass through the same function."},
+
+/* ---- the living layer, shared with the deck ---- */
+ovation:{k:"ins",t:"The aurora is a forecast",
+ b:"Not a photograph, and stamped <b>MODEL</b> for that reason. A spacecraft at L1, 1.5 million km upstream, measures the solar wind speed and the interplanetary magnetic field; OVATION-Prime turns those into the energy flux of particles precipitating into the atmosphere, from which a viewing probability follows. The roughly half-hour lead time is nothing more than how long the solar wind takes to cross the remaining distance to Earth.",
+ p:"NOAA SWPC OVATION-Prime 30-minute forecast, both hemispheres."},
+kp_index:{k:"num",t:"Kp",
+ b:"The largest wobble in the horizontal magnetic field over three hours, scaled 0 to 9, averaged across <b>thirteen ground observatories</b> — all of them between 44° and 60° geomagnetic latitude, none of them anywhere near the poles. Five or above is a geomagnetic storm. Read it as a planetary weather report, not as what any one station on this map is seeing tonight.",
+ p:"NOAA SWPC estimated planetary K index; definitive Kp from GFZ Potsdam."},
+drift_cmcc:{k:"ins",t:"How you measure ice moving",
+ b:"You photograph the pack twice, 48 hours apart, and find the displacement that best matches each patch of the first image to the second — maximum cross-correlation. The <b>continuous</b> version used here refines that match between pixels instead of snapping to the grid, which removes most of the quantisation noise. Inputs are SSMIS at 91 GHz, ASCAT and AMSR2.",
+ p:"EUMETSAT OSI SAF OSI-405-c, 62.5 km grid. Only nominal-quality vectors — status flag 30 — are drawn."},
+drift_true_length:{k:"num",t:"Why the arrows look short",
+ b:"At ×1 they are drawn at <b>true length</b>. Pack ice typically travels a few kilometres a day, so two days of motion is often less than a single 62.5 km cell — the vector is genuinely shorter than the grid it sits on. Any exaggeration is a lie unless it is labelled, which is why the multiplier is named on screen whenever it is not 1.",
+ p:"48-hour displacement. At ×1 the head and tail are both real positions."},
+sar_s1:{k:"ins",t:"Radar that makes its own light",
+ b:"Sentinel-1 carries a C-band synthetic aperture radar at <b>5.405 GHz</b>. It is active — it illuminates the surface itself, so cloud and polar night are irrelevant to it. Over sea ice it runs in Extra Wide mode, five sub-swaths stitched into a 410 km strip at 20 × 40 m. Sentinel-1A was retired in July 2026; the 6-day repeat is now flown by 1C and 1D.",
+ p:"ESA Copernicus Sentinel-1 mission specification."},
+sar_footprints:{k:"obj",t:"Footprints, not pictures",
+ b:"Each outline is <b>where the radar was pointed</b> in the last 18 hours, from the Copernicus catalogue of acquisitions — the metadata, not the imagery. The scene behind one of these polygons is a separate download of several hundred megabytes. Look at where they cluster: that is where somebody decided the ice was worth watching this week.",
+ p:"Copernicus Data Space Ecosystem OData catalogue, both polar caps, 18-hour window."},
+truecolor:{k:"ins",t:"True colour, and what it is not",
+ b:"One day of real reflectance from MODIS: red is band 1, green band 4, blue band 3, at <b>250 m</b>. Called <i>corrected</i> reflectance because Rayleigh scattering and gas absorption have been removed — but aerosols deliberately have not, so smoke and haze stay visible instead of being scrubbed out. Where it goes black, that is polar night, not missing data.",
+ p:"NASA GIBS / Worldview MODIS Corrected Reflectance, produced by LANCE."},
+bluemarble:{k:"obj",t:"Blue Marble",
+ b:"A static composite — shaded relief and <b>bathymetry</b>, so the sea floor is drawn as well as the land. Worth turning on when looking at the Southern Ocean: the pale ring around the continent is the continental shelf, and the step where it ends is where the dense water made in the coastal polynyas descends into the deep ocean.",
+ p:"NASA GIBS BlueMarble_ShadedRelief_Bathymetry. A composite with no date."},
+live_transport:{k:"ins",t:"What live means here",
+ b:"A published artifact cannot fetch anything at runtime — no network of any kind reaches it. So these layers are <b>baked at build time and stamped with their own observation time</b>, never with the build time. The same page built for a web host sets a flag and refreshes the fast layers from the identical endpoints in the browser. One data model, two transports.",
+ p:"ingest/build_events.py writes both. This copy carries the snapshot."},
+age_stamp:{k:"num",t:"Every layer states its own age",
+ b:"These ages count from the <b>observation</b>, not from the build. A two-hour-old radar footprint and a day-old drift field are both correct and they mean different things, so there is no single last-updated time on this map and there should not be one. Collapsing them into one number would be the most convenient available lie.",
+ p:"Each source carries its own observation timestamp through ingest to the page."},
+scale:{k:"num",t:"Scale, and what it costs",
+ b:"The bar is honest at the centre of the disc and increasingly wrong towards its edge — that is what a stereographic projection does, and it is why the scale is recomputed as you zoom. Distances between two stations on opposite sides of the disc should be read from their coordinates, not from this bar.",
+ p:"Computed from the current zoom against the disc radius."},
+both_poles:{k:"obj",t:"Both poles at once",
+ b:"Two discs, same scale, and the asymmetry is the first thing to see. The Antarctic is a continent surrounded by ocean and governed by a treaty with no owner; the Arctic is an ocean surrounded by <b>eight sovereign states</b>, and every station in the north stands on somebody's territory. Almost everything else about how the two registers behave follows from that one difference.",
+ p:"Same projection applied to both hemispheres; nothing is mirrored or reused."},
+surfaces:{k:"obj",t:"Three surfaces",
+ b:"This is one of three. The <b>Deck</b> is the instrument: measured sea ice back to 1978, the overturning circulation, and the living layers. <b>Stations</b> is this — who is actually on the ice. <b>Named Ice</b> is the cultural surface, where the ice has words rather than values. Same data model, same palette, three registers.",
+ p:"All three are separate builds. The payload ceiling applies to each surface rather than to the platform."},
+
+/* ---- what the network shows: the map callouts ---- */
+finding_dml:{k:"mech",t:"Two runways for a third of a continent",
+ b:"Nineteen facilities sit in Dronning Maud Land, run by nine national programmes and two logistics operators, and almost all of them are reached through <b>two blue-ice runways</b> — Novo, run by a commercial consortium beside a Russian station, and Troll, run by Norway. Perseus has since been added as a third. A single bad season at Novo would strand a large part of the continent's science, and there is no redundancy anywhere in that sentence.",
+ p:"Counted from this register: facilities between 20°W and 45°E, south of 68°S."},
+finding_fildes:{k:"mech",t:"Six stations you could walk between",
+ b:"On the Fildes Peninsula, within <b>2 km</b> of each other, sit four Chilean facilities, Russia's Bellingshausen and China's Great Wall — with Uruguay's Artigas 3.6 km further and Korea's King Sejong 9.5 km along the coast. It is the densest patch of Antarctic infrastructure anywhere, it has a gravel runway, and it is the reason King George Island is where most people who go to Antarctica actually land.",
+ p:"Great-circle distances computed from the positions in this register."},
+finding_union:{k:"mech",t:"A private runway several countries now need",
+ b:"Union Glacier Camp is run by a <b>commercial expedition company</b>, and it is the only place in Antarctica where a private operator and national programmes share a runway. Several national programmes now route people and cargo through it. Whether that is efficiency or a dependency is a question the Treaty system has not really answered.",
+ p:"Antarctic Logistics &amp; Expeditions; researched addition, post-2017."},
+finding_russia:{k:"mech",t:"The largest programme, and the least legible",
+ b:"Marked here at <b>Vostok</b>, which holds the coldest temperature ever recorded on Earth and sits above the largest subglacial lake known. Russia operates <b>19 facilities across both poles — 12 south, 7 north, 14 of them year-round</b>, more than any other operator in this register. Not one scores <i>open</i>: thirteen are opaque, four minimal, two partial. That is the sharpest illustration of why this map scores reachability separately from size, because on size alone Russia is the most present nation on the ice.",
+ p:"Counted from this register. The score is about public reachability, not about the science."},
+finding_nyalesund:{k:"mech",t:"Ten nations in one village",
+ b:"Ny-Ålesund, 78.9°N, is a former coal-mining settlement with <b>nine research facilities belonging to ten countries</b> — China, France, Germany, India, Italy, Japan, the Netherlands, Norway, South Korea and the United Kingdom — sharing a few hundred metres of shoreline. It is the closest thing the Arctic has to the Antarctic Treaty system, and it exists because Norway allows it under the 1920 Svalbard Treaty rather than because anyone agreed to it.",
+ p:"Counted from this register. AWIPEV is a single facility run jointly by Germany and France."},
+finding_terranova:{k:"mech",t:"Four countries at Terra Nova Bay",
+ b:"Italy, Korea, Germany and China all hold facilities within <b>40 km</b> of each other on the Ross Sea coast. The newest is <b>Qinling</b>, which China opened on 7 February 2024 on Inexpressible Island — the island where Scott's Northern Party wintered in a snow cave in 1912 and very nearly did not come out.",
+ p:"Great-circle distances computed from the positions in this register."}
+};
 
 const st = {
   mode:"S", sel:null, hover:null, q:"",
@@ -590,6 +760,7 @@ function draw(){
     }
   }
   g.restore();
+  st.discs.forEach(d=>{ try{ drawAnnot(d); }catch(e){} });
   $("#zoomR").textContent = "ZOOM " + st.discs.map(d=>d.z.toFixed(1)+"×").join(" / ");
 }
 
@@ -647,11 +818,12 @@ function drawBase(d){
    tiles are named and dated here rather than drawn misaligned. Aligning them is a
    projection change, not a drawing change, and it is the next piece of work.      */
 
+st.learn = false;       // the learning layer is off until asked for
 st.driftX = 1;          // vector length multiplier, always stated on screen
 const LIVE_LAYERS = [
-  {id:"aurora", nm:"Aurora",  col:"#5FE3C0"},
-  {id:"drift",  nm:"Drift",   col:"#7FE3F5"},
-  {id:"sar",    nm:"SAR",     col:"#C89BE8"},
+  {id:"aurora", nm:"Aurora",  col:"#5FE3C0", ex:"ovation"},
+  {id:"drift",  nm:"Drift",   col:"#7FE3F5", ex:"drift_cmcc"},
+  {id:"sar",    nm:"SAR",     col:"#C89BE8", ex:"sar_footprints"},
 ];
 st.live = new Set(["aurora","drift","sar"]);
 
@@ -781,21 +953,22 @@ function drawLive(d){
 function freshness(){
   if(!LIVE) return;
   const rows = [];
-  const add = (k, v, iso, mode) => rows.push(
-    `<div class="row"><span class="k">${k}</span><span class="v">${esc(v)}</span>
+  const add = (k, v, iso, ex) => rows.push(
+    `<div class="row"${ex?` data-ex="${ex}"`:""}><span class="k">${k}</span><span class="v">${esc(v)}</span>
      <span class="age">${iso ? esc(ageOf(iso) || "—") : ""}</span></div>`);
-  if(LIVE.aurora) add("AURORA", "OVATION " + (LIVE.aurora.mode||""), LIVE.aurora.observed);
-  if(LIVE.kp)     add("KP",     "index " + LIVE.kp.latest,           LIVE.kp.time);
+  if(LIVE.aurora) add("AURORA", "OVATION " + (LIVE.aurora.mode||""), LIVE.aurora.observed, "ovation");
+  if(LIVE.kp)     add("KP",     "index " + LIVE.kp.latest,           LIVE.kp.time,         "kp_index");
   if(LIVE.drift)  add("DRIFT",  (LIVE.drift.nh?LIVE.drift.nh.n:0)+(LIVE.drift.sh?LIVE.drift.sh.n:0)
                                 + " vec · " + (st.driftX>1 ? "×"+st.driftX : "true"),
-                                (LIVE.drift.sh||LIVE.drift.nh||{}).t1);
-  if(LIVE.sar)    add("SAR",    LIVE.sar.n + " passes",              (LIVE.sar.items[0]||{}).start);
+                                (LIVE.drift.sh||LIVE.drift.nh||{}).t1, "drift_cmcc");
+  if(LIVE.sar)    add("SAR",    LIVE.sar.n + " passes",              (LIVE.sar.items[0]||{}).start, "sar_s1");
   const bl = baseLayer(st.base);
   if(bl)                      add("IMAGERY", bl.day ? "MODIS " + bl.day : "Blue Marble",
-                                             bl.day ? bl.day + "T12:00:00Z" : null);
-  else if(st.base === "none") add("IMAGERY", "off", null);
+                                             bl.day ? bl.day + "T12:00:00Z" : null,
+                                             bl.day ? "truecolor" : "bluemarble");
+  else if(st.base === "none") add("IMAGERY", "off", null, "projection");
   $("#fresh").innerHTML =
-    `<div class="hd"><span class="pulse"></span>${LIVE_FETCH ? "Live · refreshing" : "Observed"} · age now</div>` +
+    `<div class="hd"><span class="pulse"></span><span data-ex="live_transport">${LIVE_FETCH ? "Live · refreshing" : "Observed"}</span> · <span data-ex="age_stamp">age now</span></div>` +
     rows.join("");
 }
 
@@ -889,6 +1062,13 @@ map.addEventListener("pointermove", ev=>{
   // readout are for pointing devices only
   if(ev.pointerType === "touch"){ return; }
   const h = hit(mx,my), tip = $("#tip");
+  if(h && h.ex){
+    tip.style.opacity = 0;
+    map.style.cursor = "help";
+    showEx(h.ex, ev.clientX, ev.clientY);
+    return;
+  }
+  hideEx();
   if(h){
     const o = BY.get(h.id);
     tip.style.opacity=1;
@@ -951,7 +1131,13 @@ map.addEventListener("pointerup", ev=>{
   // tap vs drag on displacement from the down point, not path length: a
   // fingertip wanders more than a mouse and accumulates jitter either way
   const lim = (ev.pointerType === "touch") ? 10 : 4;
-  if(Math.hypot(mx-dr.ox, my-dr.oy) < lim){ const h = hit(mx,my); select(h ? h.id : null); }
+  if(Math.hypot(mx-dr.ox, my-dr.oy) < lim){
+    const h = hit(mx,my);
+    // a tap on a callout pins its explainer; it is not a station and must not
+    // clear the selection behind it
+    if(h && h.ex){ showEx(h.ex, ev.clientX, ev.clientY); return; }
+    select(h ? h.id : null);
+  }
 });
 map.addEventListener("pointercancel", ev=>{
   if(ev && ev.pointerId != null) st.ptrs.delete(ev.pointerId); else st.ptrs.clear();
@@ -1066,7 +1252,7 @@ function renderDetail(){
 
   ${s.note ? `<div class="sec"><h4>What it is</h4><div class="prose">${esc(s.note)}</div></div>`:""}
 
-  ${(s.programmes||[]).length ? `<div class="sec"><h4>Programmes hosted</h4><div class="prog">${s.programmes.map(p=>`
+  ${(s.programmes||[]).length ? `<div class="sec"><h4 data-ex="facility_vs_programme">Programmes hosted</h4><div class="prog">${s.programmes.map(p=>`
     <div class="pg">
       <div class="pgn">${p.url?`<a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.name)}</a>`:esc(p.name)}</div>
       <div class="pgm">${esc(p.kind||"")}${p.years?" · "+esc(p.years):""}</div>
@@ -1076,24 +1262,25 @@ function renderDetail(){
     </div>`).join("")}</div>
     <div class="prov" style="margin-top:8px">A programme is work done at this facility. It is not the operator.</div></div>`:""}
 
-  ${s.changed_since_2017 ? `<div class="sec"><h4>Changed since the master list</h4><div class="prose" style="color:var(--s2)">${esc(s.changed_since_2017)}</div></div>`:""}
+  ${s.changed_since_2017 ? `<div class="sec"><h4 data-ex="comnap">Changed since the master list</h4><div class="prose" style="color:var(--s2)">${esc(s.changed_since_2017)}</div></div>`:""}
 
-  ${(s.observes||[]).length ? `<div class="sec"><h4>What it observes</h4><div class="obs">${s.observes.map(o=>`<div>${esc(o)}</div>`).join("")}</div></div>`:""}
+  ${(s.observes||[]).length ? `<div class="sec"><h4 data-ex="search">What it observes</h4><div class="obs">${s.observes.map(o=>`<div>${esc(o)}</div>`).join("")}</div></div>`:""}
 
   ${s.gateway ? `<div class="sec"><h4>How it is reached</h4><div class="prose">${esc(s.gateway)}</div></div>`:""}
 
   <div class="sec">
-    <h4>Public presence</h4>
+    <h4 data-ex="openness">Public presence</h4>
     <div class="lnk">
       ${linkRow(s.url, s.url ? "Operator / station page" : "", ls.url)}
       ${linkRow(s.webcam, "Live camera", ls.webcam)}
       ${linkRow(s.data, "Data archive", ls.data)}
       ${!s.url && !s.webcam && !s.data ? `<span class="nolink">No public station page found</span>`:""}
     </div>
+    <div class="prov" style="margin-top:7px" data-ex="link_rot">Every link above was fetched before publication.</div>
     <div class="prov" style="margin-top:9px">${esc(DATA.meta.openness_scale[s.openness]||"")}</div>
   </div>
 
-  ${(s.joint||[]).length ? `<div class="sec"><h4>Shared with</h4><div class="prose">${s.joint.map(esc).join(" · ")}</div></div>`:""}
+  ${(s.joint||[]).length ? `<div class="sec"><h4 data-ex="joint">Shared with</h4><div class="prose">${s.joint.map(esc).join(" · ")}</div></div>`:""}
 
   <div class="sec">
     <h4>Connections <span style="color:var(--ink4)">${conns.length}</span></h4>
@@ -1107,7 +1294,7 @@ function renderDetail(){
   </div>
 
   <div class="sec" style="border-bottom:0">
-    <h4>Provenance</h4>
+    <h4 data-ex="positions">Provenance</h4>
     <div class="prov">
       <b>Position</b> ${esc(s.prov.geo)}<br>
       <b>Population</b> ${esc(s.prov.demog)}<br>
@@ -1142,7 +1329,7 @@ function renderSimple(el, o, kind){
         <span><span class="nm">${esc(t.name)}</span><span class="lb">${esc(c.label)}</span></span>
         <span class="kind">${esc(EDGE_N[c.kind])}</span></button>`;
     }).join("")}</div></div>`:""}
-  <div class="sec" style="border-bottom:0"><h4>Provenance</h4><div class="prov">
+  <div class="sec" style="border-bottom:0"><h4 data-ex="positions">Provenance</h4><div class="prov">
     ${kind==="Gateway"?"Gateway ports and hubs are editorial, chosen for the routes that actually run through them.":"Heritage positions are published site coordinates. Framheim and the Fram drift start are approximate — the ice they stood on has moved or gone."}
   </div></div>`;
   el.scrollTop = 0;
@@ -1173,7 +1360,7 @@ function nationsPanel(){
     </div>
   </div>
   <div class="sec">
-    <h4>Operators, by facilities held</h4>
+    <h4 data-ex="operators">Operators, by facilities held</h4>
     <table class="nat"><thead><tr><th>Operator</th><th class="c">All</th><th class="c">Yr</th><th style="width:80px">Openness</th></tr></thead><tbody>
     ${list.map(e=>`<tr data-nat="${esc(e.n)}" style="cursor:pointer">
       <td class="n" title="${esc(e.n)}">${esc(e.n)}</td>
@@ -1184,7 +1371,7 @@ function nationsPanel(){
     </tbody></table>
   </div>
   <div class="sec" style="border-bottom:0">
-    <h4>Reading this map</h4>
+    <h4 data-ex="edges">Reading this map</h4>
     <div class="prose">
       Filled dots are year-round facilities; hollow dots close for the winter. Colour is public presence, not
       importance. Lines are how places are actually connected — flights, ships, tractor traverses, and the few
@@ -1222,22 +1409,23 @@ function buildFilters(){
     renderList(); draw(); if(!st.sel) renderDetail(), wireNationRows();
   }));
   $("#netBar").innerHTML = Object.keys(EDGE_C).map(k=>
-    `<button data-net="${k}" aria-pressed="true" style="color:${EDGE_C[k]}">${EDGE_N[k]}</button>`).join("");
+    `<button data-net="${k}" aria-pressed="true" style="color:${EDGE_C[k]}" data-ex="${k==="joint"?"joint":"edges"}">${EDGE_N[k]}</button>`).join("");
   $$("#netBar button").forEach(b=>b.addEventListener("click",()=>{
     const k=b.dataset.net; st.net.has(k)?st.net.delete(k):st.net.add(k);
     b.setAttribute("aria-pressed", String(st.net.has(k))); draw();
   }));
-  const bases = [{k:"relief",nm:"Relief"},{k:"today",nm:"Today"},{k:"none",nm:"None"}]
+  const bases = [{k:"relief",nm:"Relief",ex:"bluemarble"},{k:"today",nm:"Today",ex:"truecolor"},
+                 {k:"none",nm:"None",ex:"projection"}]
       .filter(b=> b.k==="none" || baseLayer(b.k));
   $("#baseBar").innerHTML = bases.map(b=>
-    `<button data-base="${b.k}" aria-pressed="${b.k===st.base}">${esc(b.nm)}</button>`).join("");
+    `<button data-base="${b.k}" aria-pressed="${b.k===st.base}" data-ex="${b.ex}">${esc(b.nm)}</button>`).join("");
   $$("#baseBar button").forEach(b=>b.addEventListener("click",()=>{
     st.base = b.dataset.base;
     $$("#baseBar button").forEach(o=>o.setAttribute("aria-pressed", String(o.dataset.base===st.base)));
     freshness(); draw();
   }));
   $("#liveBar").innerHTML = LIVE_LAYERS.map(l=>
-    `<button data-live="${l.id}" aria-pressed="true" style="color:${l.col}">${esc(l.nm)}</button>`).join("");
+    `<button data-live="${l.id}" aria-pressed="true" style="color:${l.col}" data-ex="${l.ex}">${esc(l.nm)}</button>`).join("");
   $$("#liveBar button").forEach(b=>b.addEventListener("click",()=>{
     const k=b.dataset.live; st.live.has(k)?st.live.delete(k):st.live.add(k);
     b.setAttribute("aria-pressed", String(st.live.has(k))); draw();
@@ -1248,6 +1436,119 @@ function buildFilters(){
     freshness(); draw();
   }));
 }
+
+
+/* ---- the callouts: anchored on the map, drawn only when LEARN is on ---- */
+const ANNOT = [
+  {ex:"finding_dml",        S:true,  at:[11.63,-70.83], t:"Two runways"},
+  {ex:"finding_fildes",     S:true,  at:[-58.96,-62.20], t:"Fildes"},
+  {ex:"finding_union",      S:true,  at:[-82.87,-79.77], t:"Union Glacier"},
+  {ex:"finding_terranova",  S:true,  at:[163.72,-74.93], t:"Terra Nova Bay"},
+  {ex:"finding_russia",     S:true,  at:[106.84,-78.46], t:"Vostok"},
+  {ex:"finding_nyalesund",  S:false, at:[11.93,78.92],   t:"Ny-\u00c5lesund"}
+];
+
+function drawAnnot(d){
+  if(!st.learn) return;
+  for(let i=0;i<ANNOT.length;i++){
+    const a = ANNOT[i];
+    if(a.S !== d.S) continue;
+    const p = place(a.at[1], a.at[0]);
+    if(!p || p.d !== d) continue;
+    const x = p.x, y = p.y;
+    g.save();
+    g.strokeStyle = "rgba(127,227,245,.85)"; g.lineWidth = 1.1;
+    g.setLineDash([3,3]);
+    g.beginPath(); g.arc(x, y, 13, 0, 7); g.stroke();
+    g.setLineDash([]);
+    g.fillStyle = "rgba(6,9,14,.88)";
+    g.beginPath(); g.arc(x, y, 8, 0, 7); g.fill();
+    g.strokeStyle = "rgba(127,227,245,.95)"; g.lineWidth = 1;
+    g.beginPath(); g.arc(x, y, 8, 0, 7); g.stroke();
+    g.fillStyle = "#7FE3F5";
+    g.font = "600 10px 'Saira Condensed', sans-serif";
+    g.textAlign = "center"; g.textBaseline = "middle";
+    g.fillText(String(i+1), x, y+0.5);
+    // label, offset so it does not sit on the station it is about
+    g.font = "600 9.5px 'Saira Condensed', sans-serif";
+    g.textAlign = "left"; g.textBaseline = "alphabetic";
+    const tw = g.measureText(a.t.toUpperCase()).width;
+    g.fillStyle = "rgba(6,9,14,.80)";
+    g.fillRect(x+15, y-13, tw+8, 14);
+    g.fillStyle = "#7FE3F5";
+    g.fillText(a.t.toUpperCase(), x+19, y-3);
+    g.restore();
+    HOT.push({x, y, r:15, ex:a.ex});
+  }
+}
+
+/* ---- the popup ---- */
+const exBox = document.createElement("div");
+exBox.className = "exbox"; exBox.setAttribute("role","tooltip"); exBox.hidden = true;
+document.body.appendChild(exBox);
+let exId = null;
+function showEx(id, px, py){
+  if(!st.learn){ hideEx(); return; }
+  const e = EXPL[id]; if(!e){ hideEx(); return; }
+  if(exId !== id){
+    exId = id;
+    exBox.innerHTML = `<div class="exh"><span class="exk k-${e.k}">${EXKIND[e.k]}</span><b>${e.t}</b></div>` +
+                      `<div class="exb">${e.b}</div><div class="exp">${e.p}</div>`;
+  }
+  exBox.hidden = false;
+  const w = exBox.offsetWidth, h = exBox.offsetHeight;
+  let x = px + 16, y = py + 16;
+  if(x + w > innerWidth - 8)  x = px - w - 16;
+  if(y + h > innerHeight - 8) y = Math.max(8, py - h - 16);
+  exBox.style.left = Math.max(8, x) + "px";
+  exBox.style.top  = Math.max(8, y) + "px";
+}
+function hideEx(){ if(!exBox.hidden){ exBox.hidden = true; exId = null; } }
+
+document.addEventListener("pointerover", e=>{
+  const t = e.target.closest?.("[data-ex]");
+  if(t) showEx(t.dataset.ex, e.clientX, e.clientY);
+});
+document.addEventListener("pointermove", e=>{
+  const t = e.target.closest?.("[data-ex]");
+  if(t && exId === t.dataset.ex) showEx(t.dataset.ex, e.clientX, e.clientY);
+});
+document.addEventListener("pointerout", e=>{
+  const t = e.target.closest?.("[data-ex]");
+  if(t && !t.contains(e.relatedTarget)) hideEx();
+});
+document.addEventListener("focusin", e=>{
+  const t = e.target.closest?.("[data-ex]");
+  if(t){ const r = t.getBoundingClientRect(); showEx(t.dataset.ex, r.right, r.top); }
+});
+document.addEventListener("focusout", e=>{ if(e.target.closest?.("[data-ex]")) hideEx(); });
+document.addEventListener("keydown", e=>{ if(e.key === "Escape") hideEx(); });
+
+/* ---- the index: every entry reachable by name, not by luck ---- */
+function exIndex(){
+  const head = $("#exIndexHead"), box = $("#exIndex");
+  if(!head || !box) return;
+  head.hidden = !st.learn; box.hidden = !st.learn;
+  if(!st.learn){ box.innerHTML = ""; return; }
+  const order = ["mech","obj","ins","num"];
+  const by = {}; order.forEach(k => by[k] = []);
+  for(const [id, e] of Object.entries(EXPL)) (by[e.k] || (by[e.k] = [])).push([id, e.t]);
+  box.innerHTML = order.map(k => {
+    const rows = by[k] || [];
+    if(!rows.length) return "";
+    return `<div class="grp">${EXKIND[k]}</div>` + rows.map(([id, t]) =>
+      `<button type="button" data-ex="${id}">${t}</button>`).join("");
+  }).join("");
+  $("#exCount").textContent = Object.keys(EXPL).length;
+}
+
+$("#learnBtn").addEventListener("click", ()=>{
+  st.learn = !st.learn;
+  $("#learnBtn").setAttribute("aria-pressed", String(st.learn));
+  document.body.classList.toggle("learning", st.learn);
+  if(!st.learn) hideEx();
+  exIndex(); draw();
+});
 
 $("#q").addEventListener("input", e=>{ st.q = e.target.value.trim(); renderList(); draw(); if(!st.sel){ renderDetail(); wireNationRows(); } });
 $$("#modeBar button").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));

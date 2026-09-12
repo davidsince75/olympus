@@ -1,0 +1,462 @@
+<title>The Six-Kilometre Ice</title>
+<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans+Condensed:wght@400;600&amp;display=swap">
+<!-- non-blocking: a plain <link> to fonts.googleapis.com blanked two Olympus
+     surfaces when that host was slow. Never load it render-blocking again. -->
+<style>
+/* ---------------------------------------------------------------------------
+   Olympus instrument register. Void ground, hairline rules, monospace readouts,
+   colour reserved for meaning. Deliberately single-theme: this is an instrument
+   face, and it is the same register the deck and the Atlas are drawn in.
+   --------------------------------------------------------------------------- */
+:root{
+  --void:#07090c; --panel:#0b0f14; --rule:#1a222b; --rule-hi:#2b3742;
+  --ink:#ccd7e0; --ink-dim:#7b8894; --ink-faint:#4d5862;
+  --sig:#4ec9e0;            /* measured / live */
+  --warn:#ffb454;           /* the 15 % extent threshold, and nothing else */
+  --bad:#ff6b6b;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:"IBM Plex Sans Condensed","IBM Plex Sans",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--void);color:var(--ink);
+  font-family:var(--sans);font-size:14px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{padding-inline:16px;padding-block:20px;max-width:1400px;margin:0 auto}
+
+header{border-bottom:1px solid var(--rule);padding-bottom:14px;margin-bottom:16px}
+.eyebrow{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-faint);display:flex;gap:14px;flex-wrap:wrap;align-items:baseline
+}
+.eyebrow .meas{color:var(--sig)}
+h1{
+  font-family:var(--sans);font-weight:600;font-size:clamp(22px,3.4vw,34px);
+  letter-spacing:-.01em;margin:.35em 0 .15em;text-wrap:balance
+}
+.standfirst{color:var(--ink-dim);max-width:66ch;margin:0}
+.standfirst b{color:var(--ink);font-weight:600}
+
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+@media (max-width:860px){.stage{grid-template-columns:minmax(0,1fr)}}
+
+.canvas-frame{
+  position:relative;border:1px solid var(--rule);background:#04060a;
+  aspect-ratio:1/1;max-width:100%;overflow:hidden;touch-action:none;cursor:crosshair
+}
+canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
+.overlay{
+  position:absolute;inset:auto 0 0 0;display:flex;justify-content:space-between;
+  gap:10px;padding:8px 10px;font-family:var(--mono);font-size:10.5px;
+  color:var(--ink-dim);background:linear-gradient(transparent,#04060ae6 55%);
+  pointer-events:none;letter-spacing:.04em
+}
+.scalebar{position:absolute;left:10px;top:10px;font-family:var(--mono);font-size:10.5px;color:var(--ink-dim)}
+.scalebar i{display:block;height:3px;border:1px solid var(--ink-faint);border-top:0;margin-top:3px}
+
+.rail{display:flex;flex-direction:column;gap:14px;min-width:0}
+.block{border:1px solid var(--rule);background:var(--panel)}
+.block > h2{
+  font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink-faint);margin:0;padding:9px 11px;border-bottom:1px solid var(--rule)
+}
+.block .body{padding:11px}
+
+.seg{display:flex;gap:0;border:1px solid var(--rule-hi)}
+.seg button{
+  flex:1;appearance:none;border:0;border-right:1px solid var(--rule-hi);
+  background:transparent;color:var(--ink-dim);font-family:var(--mono);font-size:11px;
+  letter-spacing:.08em;padding:8px 6px;cursor:pointer;transition:background .12s,color .12s
+}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--sig);color:#05191f;font-weight:500}
+.seg button:focus-visible{outline:2px solid var(--sig);outline-offset:-2px}
+
+dl.readout{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;margin:0;font-family:var(--mono);font-size:11.5px}
+dl.readout dt{color:var(--ink-faint);letter-spacing:.06em;text-transform:uppercase;font-size:10px;align-self:center}
+dl.readout dd{margin:0;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
+dl.readout dd > span:first-child{color:inherit}
+dd .unit{color:var(--ink-faint);font-size:10px;margin-left:3px}
+dd.noobs{color:var(--ink-faint);letter-spacing:.1em}
+
+.ramp{height:9px;margin:2px 0 5px;border:1px solid var(--rule-hi)}
+.ramp-labels{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9.5px;color:var(--ink-faint)}
+.threshold{display:flex;align-items:center;gap:7px;margin-top:9px;font-family:var(--mono);font-size:10px;color:var(--ink-dim)}
+.threshold i{width:11px;height:11px;border:1px solid var(--warn);background:#ffb45426;flex:none}
+
+.prov{font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);line-height:1.65;word-break:break-word}
+.prov b{color:var(--sig);font-weight:500;letter-spacing:.06em}
+.prov a{color:var(--ink-dim)}
+.prov .hash{color:var(--ink-faint)}
+
+.note{border-left:2px solid var(--rule-hi);padding-left:12px;color:var(--ink-dim);max-width:66ch}
+.note h3{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);margin:0 0 5px}
+.note p{margin:0 0 9px}
+.note code{font-family:var(--mono);font-size:.92em;color:var(--ink)}
+footer{margin-top:22px;padding-top:14px;border-top:1px solid var(--rule);display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.hint{font-family:var(--mono);font-size:10px;color:var(--ink-faint);letter-spacing:.05em;margin-top:8px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">
+    <span class="meas">MEAS</span>
+    <span>ASI · AMSR2 89 GHz</span>
+    <span>6.25 km</span>
+    <span id="eyebrow-epsg">EPSG:3413</span>
+    <span id="eyebrow-date">2026-09-11</span>
+  </div>
+  <h1>The Six-Kilometre Ice</h1>
+  <p class="standfirst">The deck draws sea ice on a 220-cell hemisphere raster — about
+  <b>45 km a side</b>, which makes the marginal ice zone roughly four pixels wide. This is the
+  same day at <b>6.25 km</b>, in its own projection, from the institute that wrote the algorithm.
+  Switch the cell size to see what the current field is throwing away.</p>
+</header>
+
+<div class="stage">
+  <div>
+    <div class="canvas-frame" id="frame">
+      <canvas id="map" width="900" height="900"></canvas>
+      <div class="scalebar"><span id="scaletxt">500 km</span><i id="scalebar" style="width:90px"></i></div>
+      <div class="overlay">
+        <span id="ov-left">drag to pan · scroll to zoom</span>
+        <span id="ov-right"></span>
+      </div>
+    </div>
+    <p class="hint" id="hint">Cursor position is inverted through the grid's own polar stereographic definition — the same code the ingest used to place it.</p>
+  </div>
+
+  <div class="rail">
+    <div class="block">
+      <h2>Field</h2>
+      <div class="body" style="display:flex;flex-direction:column;gap:10px">
+        <div class="seg" role="group" aria-label="Hemisphere">
+          <button id="b-n" aria-pressed="true">ARCTIC</button>
+          <button id="b-s" aria-pressed="false">ANTARCTIC</button>
+        </div>
+        <div class="seg" role="group" aria-label="Cell size">
+          <button id="b-native" aria-pressed="true">6.25 km</button>
+          <button id="b-deck" aria-pressed="false">43.75 km</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <h2>Under the cursor</h2>
+      <div class="body">
+        <dl class="readout">
+          <dt>Concentration</dt><dd id="r-conc" class="noobs">—</dd>
+          <dt>Latitude</dt><dd id="r-lat" class="noobs">—</dd>
+          <dt>Longitude</dt><dd id="r-lon" class="noobs">—</dd>
+          <dt>Grid cell</dt><dd id="r-cell" class="noobs">—</dd>
+          <dt>Cell area</dt><dd id="r-area" class="noobs">—</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="block">
+      <h2>This frame</h2>
+      <div class="body">
+        <dl class="readout">
+          <dt>Observed</dt><dd id="r-obs">—</dd>
+          <dt>Extent</dt><dd><span id="r-extent">—</span><span class="unit">M km²</span></dd>
+          <dt>Ice area</dt><dd><span id="r-icearea">—</span><span class="unit">M km²</span></dd>
+          <dt>Cells</dt><dd id="r-cells">—</dd>
+          <dt>Grid</dt><dd id="r-grid">—</dd>
+        </dl>
+        <div class="ramp" id="ramp"></div>
+        <div class="ramp-labels"><span>0 %</span><span>50 %</span><span>100 %</span></div>
+        <div class="threshold"><i></i> 15 % — the extent threshold, a convention, not a measurement</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <h2>Provenance</h2>
+      <div class="body prov" id="prov"></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="note">
+    <h3>Why the two cell sizes are comparable</h3>
+    <p>The 43.75 km field is this same ASI array block-averaged 7×7, not a different product.
+    It is drawn at the same screen size so the comparison is of resolution alone. The deck's
+    present raster is 220 cells across a hemisphere disc — close to 45 km a cell — so this is
+    what the deck can currently resolve, using data it does not yet carry.</p>
+    <p>No-value cells stay no-value: a block is averaged over the cells that carry a reading,
+    and a block with none stays empty rather than becoming zero.</p>
+  </div>
+  <div class="note">
+    <h3>3976 is not 3031</h3>
+    <p>The Arctic grid is <code>EPSG:3413</code>; the Antarctic grid is <code>EPSG:3976</code>,
+    standard parallel 70° S. NASA GIBS publishes Antarctic tiles on <code>EPSG:3031</code>,
+    standard parallel 71° S. Those two differ by <b>6.6 km at 70° S</b> and 10.0 km at 60° S —
+    more than a cell of anything drawn here. Any surface that carries both must convert.</p>
+  </div>
+  <div class="note">
+    <h3>What is not claimed</h3>
+    <p>Concentration is a retrieval, not a photograph: the ASI algorithm infers it from the
+    89 GHz polarisation difference, and it is least certain exactly where it is most interesting —
+    thin ice, melt ponds, and the ice edge in summer. The field carries no uncertainty layer here
+    because this frame does not carry one; when it does, it will be drawn rather than described.</p>
+  </div>
+</footer>
+</div>
+
+<script>
+__PROJ_JS__
+</script>
+<script>
+(function(){
+  "use strict";
+  var P = window.OlympusProj;
+  var FRAMES = __FRAMES_JSON__;
+  var NO_VALUE = 255, SCALE = 2.0, THRESH = 15.0, BLOCK = 7;
+
+  var state = { hemi:"n", block:1, zoom:1, cx:0.5, cy:0.5, drag:null };
+  var store = {};   // hemi -> {codes, w, h, grid, dec:{codes,w,h}, rec}
+
+  /* ---- colour ramp: open water to solid floe, with the 15 % edge marked ---- */
+  var RAMP = (function(){
+    var stops = [
+      [0,   0x0a,0x16,0x20],
+      [15,  0x12,0x33,0x4a],
+      [40,  0x24,0x5f,0x80],
+      [70,  0x55,0x9c,0xbe],
+      [90,  0x9f,0xd4,0xe8],
+      [100, 0xf2,0xf8,0xfb]
+    ];
+    var lut = new Uint8Array(256*3);
+    for (var v=0; v<=200; v++){
+      var pct = v/SCALE, i=0;
+      while (i < stops.length-2 && pct > stops[i+1][0]) i++;
+      var a=stops[i], b=stops[i+1];
+      var t=(pct-a[0])/(b[0]-a[0]); if(t<0)t=0; if(t>1)t=1;
+      lut[v*3]   = Math.round(a[1]+(b[1]-a[1])*t);
+      lut[v*3+1] = Math.round(a[2]+(b[2]-a[2])*t);
+      lut[v*3+2] = Math.round(a[3]+(b[3]-a[3])*t);
+    }
+    return lut;
+  })();
+  (function(){
+    var c=document.createElement("canvas"); c.width=200; c.height=1;
+    var g=c.getContext("2d"), d=g.createImageData(200,1);
+    for(var i=0;i<200;i++){ d.data[i*4]=RAMP[i*3]; d.data[i*4+1]=RAMP[i*3+1]; d.data[i*4+2]=RAMP[i*3+2]; d.data[i*4+3]=255; }
+    g.putImageData(d,0,0);
+    document.getElementById("ramp").style.background="url("+c.toDataURL()+") center/100% 100% no-repeat";
+  })();
+
+  function decode(rec, cb){
+    var img = new Image();
+    img.onload = function(){
+      var c=document.createElement("canvas"); c.width=img.width; c.height=img.height;
+      var g=c.getContext("2d",{willReadFrequently:true});
+      g.drawImage(img,0,0);
+      var px=g.getImageData(0,0,img.width,img.height).data;
+      var codes=new Uint8Array(img.width*img.height);
+      for(var i=0,n=codes.length;i<n;i++) codes[i]=px[i*4];
+      cb(codes, img.width, img.height);
+    };
+    img.src = rec.png;
+  }
+
+  /* Block-average to the deck's cell size. A block with no readings stays empty. */
+  function decimate(codes,w,h,k){
+    var W=Math.ceil(w/k), H=Math.ceil(h/k), out=new Uint8Array(W*H);
+    for(var by=0;by<H;by++) for(var bx=0;bx<W;bx++){
+      var sum=0,n=0;
+      for(var y=by*k;y<Math.min((by+1)*k,h);y++)
+        for(var x=bx*k;x<Math.min((bx+1)*k,w);x++){
+          var v=codes[y*w+x];
+          if(v!==NO_VALUE){ sum+=v; n++; }
+        }
+      out[by*W+bx] = n ? Math.round(sum/n) : NO_VALUE;
+    }
+    return {codes:out,w:W,h:H};
+  }
+
+  function grid(hemi){ return hemi==="n" ? P.ASI_N6250 : P.ASI_S6250; }
+
+  function ensure(hemi, then){
+    if(store[hemi]) return then(store[hemi]);
+    var rec = FRAMES[hemi];
+    decode(rec, function(codes,w,h){
+      store[hemi]={codes:codes,w:w,h:h,rec:rec,grid:grid(hemi),dec:decimate(codes,w,h,BLOCK)};
+      then(store[hemi]);
+    });
+  }
+
+  var cv=document.getElementById("map"), ctx=cv.getContext("2d");
+  var img=ctx.createImageData(cv.width,cv.height);
+
+  function view(){
+    var s=store[state.hemi]; if(!s) return null;
+    var src = state.block===1 ? {codes:s.codes,w:s.w,h:s.h} : s.dec;
+    return {s:s, src:src, span: 1/state.zoom};
+  }
+
+  function draw(){
+    var v=view(); if(!v) return;
+    var W=cv.width,H=cv.height,d=img.data;
+    var span=v.span, x0=state.cx-span/2, y0=state.cy-span/2;
+    var sw=v.src.w, sh=v.src.h;
+    for(var py=0;py<H;py++){
+      var fy=(y0+(py+0.5)/H*span)*sh;
+      var sy=fy|0;
+      var rowOk = sy>=0 && sy<sh;
+      for(var px=0;px<W;px++){
+        var o=(py*W+px)*4;
+        if(!rowOk){ d[o]=4;d[o+1]=6;d[o+2]=10;d[o+3]=255; continue; }
+        var fx=(x0+(px+0.5)/W*span)*sw, sx=fx|0;
+        if(sx<0||sx>=sw){ d[o]=4;d[o+1]=6;d[o+2]=10;d[o+3]=255; continue; }
+        var c=v.src.codes[sy*sw+sx];
+        if(c===255){ d[o]=11;d[o+1]=14;d[o+2]=18;d[o+3]=255; }
+        else { d[o]=RAMP[c*3]; d[o+1]=RAMP[c*3+1]; d[o+2]=RAMP[c*3+2]; d[o+3]=255; }
+      }
+    }
+    ctx.putImageData(img,0,0);
+    drawEdge(v);
+    scalebar(v);
+  }
+
+  /* The 15 % line, drawn where the field crosses it — the threshold made visible. */
+  function drawEdge(v){
+    var W=cv.width,H=cv.height, span=v.span, x0=state.cx-span/2, y0=state.cy-span/2;
+    var sw=v.src.w, sh=v.src.h, code=THRESH*SCALE;
+    ctx.save();
+    ctx.beginPath();
+    for(var py=0;py<H;py++){
+      for(var px=0;px<W;px++){
+        var sx=((x0+(px+0.5)/W*span)*sw)|0, sy=((y0+(py+0.5)/H*span)*sh)|0;
+        if(sx<0||sy<0||sx>=sw-1||sy>=sh-1) continue;
+        var a=v.src.codes[sy*sw+sx], b=v.src.codes[sy*sw+sx+1], c=v.src.codes[(sy+1)*sw+sx];
+        if(a===255) continue;
+        if((b!==255 && ((a<code)!==(b<code))) || (c!==255 && ((a<code)!==(c<code)))){
+          ctx.rect(px,py,1,1);
+        }
+      }
+    }
+    ctx.fillStyle="#ffb454"; ctx.globalAlpha=.7; ctx.fill(); ctx.restore();
+  }
+
+  function scalebar(v){
+    var g=v.s.grid, mPerCell=Math.abs(g.gt[1]);
+    var cellsAcross = v.src.w * v.span;
+    var mAcross = cellsAcross * mPerCell * (state.block===1?1:BLOCK);
+    var target = mAcross*0.22, nice=[50,100,200,500,1000,2000,4000];
+    var km = nice[0];
+    for (var i=0;i<nice.length;i++){ if(nice[i]*1000 <= target) km=nice[i]; }
+    document.getElementById("scaletxt").textContent = km+" km";
+    document.getElementById("scalebar").style.width = Math.round(km*1000/mAcross*cv.clientWidth)+"px";
+  }
+
+  function fmt(n,d){ return n.toLocaleString("en",{minimumFractionDigits:d,maximumFractionDigits:d}); }
+  function set(id,txt,noobs){
+    var el=document.getElementById(id);
+    el.textContent=txt; el.classList.toggle("noobs",!!noobs);
+  }
+
+  function meta(){
+    var s=store[state.hemi]; if(!s) return;
+    var r=s.rec, st=r.statistics;
+    document.getElementById("eyebrow-epsg").textContent="EPSG:"+r.epsg;
+    document.getElementById("eyebrow-date").textContent=r.observed;
+    set("r-obs", r.observed);
+    set("r-extent", fmt(st.extent_km2/1e6,2));
+    set("r-icearea", fmt(st.area_km2/1e6,2));
+    set("r-cells", (state.block===1
+      ? s.w+" × "+s.h
+      : s.dec.w+" × "+s.dec.h));
+    set("r-grid", Math.round(Math.abs(s.grid.gt[1])*(state.block===1?1:BLOCK)/1000*100)/100+" km");
+    document.getElementById("prov").innerHTML =
+      '<b>MEAS</b> · observed '+r.observed+'<br>'+
+      r.instrument+'<br>'+r.algorithm+'<br>'+
+      r.producer+'<br>'+
+      '<a href="'+r.source.url+'" rel="noreferrer">'+r.source.url.replace(/^https:\/\//,"")+'</a><br>'+
+      '<span class="hash">sha256 '+r.source.sha256.slice(0,16)+'…</span><br>'+
+      '<span class="hash">retrieved '+r.source.retrieved_utc+'</span><br>'+
+      '<span class="hash">quantised to '+r.encoding.quantisation_step_pct+' %, worst error '+
+      r.encoding.worst_quantisation_error_pct+' %</span>';
+  }
+
+  function cursor(ev){
+    var v=view(); if(!v) return;
+    var rect=cv.getBoundingClientRect();
+    var u=(ev.clientX-rect.left)/rect.width, w=(ev.clientY-rect.top)/rect.height;
+    var span=v.span;
+    var gx=(state.cx-span/2+u*span)*v.src.w, gy=(state.cy-span/2+w*span)*v.src.h;
+    var sx=gx|0, sy=gy|0;
+    if(sx<0||sy<0||sx>=v.src.w||sy>=v.src.h){ blank(); return; }
+    var code=v.src.codes[sy*v.src.w+sx];
+    var k=(state.block===1?1:BLOCK);
+    var col=sx*k+(k-1)/2, row=sy*k+(k-1)/2;
+    var ll=v.s.grid.colrowToLatLon(col,row);
+    set("r-lat", fmt(Math.abs(ll[0]),3)+"° "+(ll[0]>=0?"N":"S"));
+    set("r-lon", fmt(Math.abs(ll[1]),3)+"° "+(ll[1]>=0?"E":"W"));
+    set("r-cell", (state.block===1? sx+", "+sy : sx+", "+sy+" ▪"+BLOCK));
+    if(code===255){ set("r-conc","NO VALUE",true); }
+    else { set("r-conc", fmt(code/SCALE,1)+" %"); }
+    set("r-area", fmt(v.s.grid.cellAreaKm2(ll[0])*k*k,1)+" km²");
+    document.getElementById("ov-right").textContent =
+      (state.zoom>1.01? "×"+fmt(state.zoom,1)+" · ":"")+v.s.rec.hemisphere.toUpperCase();
+  }
+  function blank(){
+    ["r-conc","r-lat","r-lon","r-cell","r-area"].forEach(function(id){ set(id,"—",true); });
+  }
+
+  /* ---- interaction ---- */
+  var frame=document.getElementById("frame");
+  frame.addEventListener("mousemove", function(ev){
+    if(state.drag){
+      var rect=cv.getBoundingClientRect(), span=1/state.zoom;
+      state.cx -= (ev.clientX-state.drag.x)/rect.width*span;
+      state.cy -= (ev.clientY-state.drag.y)/rect.height*span;
+      clampCentre();
+      state.drag={x:ev.clientX,y:ev.clientY};
+      draw();
+    }
+    cursor(ev);
+  });
+  frame.addEventListener("mouseleave", blank);
+  frame.addEventListener("mousedown", function(ev){ state.drag={x:ev.clientX,y:ev.clientY}; ev.preventDefault(); });
+  window.addEventListener("mouseup", function(){ state.drag=null; });
+  frame.addEventListener("wheel", function(ev){
+    ev.preventDefault();
+    var rect=cv.getBoundingClientRect();
+    var u=(ev.clientX-rect.left)/rect.width, w=(ev.clientY-rect.top)/rect.height;
+    var span=1/state.zoom;
+    var ax=state.cx-span/2+u*span, ay=state.cy-span/2+w*span;   // anchor under cursor
+    var z=state.zoom*(ev.deltaY<0?1.18:1/1.18);
+    state.zoom=Math.max(1,Math.min(24,z));
+    var ns=1/state.zoom;
+    state.cx=ax-(u-0.5)*ns; state.cy=ay-(w-0.5)*ns;
+    clampCentre(); draw(); cursor(ev);
+  }, {passive:false});
+  function clampCentre(){
+    var h=1/state.zoom/2;
+    state.cx=Math.max(h,Math.min(1-h,state.cx));
+    state.cy=Math.max(h,Math.min(1-h,state.cy));
+  }
+
+  function press(id,on){ document.getElementById(id).setAttribute("aria-pressed", on?"true":"false"); }
+  function setHemi(h){
+    state.hemi=h; press("b-n",h==="n"); press("b-s",h==="s");
+    state.zoom=1; state.cx=0.5; state.cy=0.5;
+    ensure(h,function(){ meta(); draw(); });
+  }
+  function setBlock(b){
+    state.block=b; press("b-native",b===1); press("b-deck",b!==1);
+    meta(); draw();
+  }
+  document.getElementById("b-n").onclick=function(){ setHemi("n"); };
+  document.getElementById("b-s").onclick=function(){ setHemi("s"); };
+  document.getElementById("b-native").onclick=function(){ setBlock(1); };
+  document.getElementById("b-deck").onclick=function(){ setBlock(BLOCK); };
+
+  ensure("n", function(){ meta(); draw(); });
+  ensure("s", function(){});
+})();
+</script>

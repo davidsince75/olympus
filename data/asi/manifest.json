@@ -1,0 +1,127 @@
+{
+ "generated_utc": "2026-09-12T13:49:02Z",
+ "product": "ASI AMSR2 sea-ice concentration, 6.25 km",
+ "producer": "Institute of Environmental Physics, University of Bremen",
+ "source_root": "https://data.seaice.uni-bremen.de/amsr2/asi_daygrid_swath",
+ "licence_note": "Freely available for research and education; cite Spreen et al. 2008 and the University of Bremen. Confirm terms before commercial use.",
+ "frames": [
+  {
+   "id": "asi-s6250-20260911",
+   "hemisphere": "Antarctic",
+   "observed": "2026-09-11",
+   "parameter": "sea ice concentration",
+   "units": "percent",
+   "mode": "MEAS",
+   "instrument": "AMSR2 (GCOM-W1), 89 GHz",
+   "algorithm": "ARTIST Sea Ice (ASI) v5.4",
+   "producer": "Institute of Environmental Physics, University of Bremen",
+   "resolution_m": 6250,
+   "epsg": 3976,
+   "width": 1264,
+   "height": 1328,
+   "encoding": {
+    "file": "asi-s6250-20260911.png",
+    "bytes": 299925,
+    "type": "8-bit PNG, row 0 = north edge of the GeoTransform",
+    "code_to_value": "concentration_percent = code / 2",
+    "no_value_code": 255,
+    "quantisation_step_pct": 0.5,
+    "worst_quantisation_error_pct": 0.25
+   },
+   "statistics": {
+    "extent_km2": 17269134.2,
+    "area_km2": 15808181.0,
+    "extent_threshold_pct": 15.0,
+    "cells_with_value": 1314336,
+    "cells_no_value": 364256,
+    "nominal_cell_km2": 39.0625,
+    "true_cell_km2_range": [
+     27.707,
+     41.5282
+    ]
+   },
+   "source": {
+    "label": "asi-s6250-20260911",
+    "url": "https://data.seaice.uni-bremen.de/amsr2/asi_daygrid_swath/s6250/netcdf/2026/asi-AMSR2-s6250-20260911-v5.4.nc",
+    "retrieved_utc": "2026-09-12T13:48:56Z",
+    "http_last_modified": "Sat, 12 Sep 2026 04:37:30 GMT",
+    "bytes": 1460774,
+    "sha256": "0a3387ca85a474e90e864bedd9c23862258033144c3bcff6c5fa6abf85ceeb0d"
+   },
+   "geometry": {
+    "declared_crs": {
+     "grid_mapping_name": "polar_stereographic",
+     "standard_parallel": -70.0,
+     "straight_vertical_longitude_from_pole": 0.0,
+     "semi_major_axis": 6378137.0,
+     "inverse_flattening": 298.257223563,
+     "GeoTransform": "-3950000 6250 0 4350000 0 -6250"
+    },
+    "y_axis_was_ascending": true,
+    "source_history": "Sat Sep 12 06:37:29 2026: GDAL CreateCopy( /mnt/web//data/amsr2/asi_daygrid_swath/s6250/netcdf/2026/asi-AMSR2-s6250-20260911-v5.4.nc, ... )\ngrdmath /mnt/web//data/amsr2/asi_daygrid_swath/s6250/2026/sep/Antarctic//asi-AMSR2-s6250-20260911-v5.4.hdf FLIPUD = tmp1.nc",
+    "source_info": "AMSR2 sea ice concentration based on the ASI algorithm (Spreen et al.,2008). www.seaice.uni-bremen.de",
+    "source_author": "University of Bremen, Gunnar Spreen [gunnar.spreen@uni-bremen.de], Christian Melsheimer [melsheim@uni-bremen.de]"
+   },
+   "citation": "Spreen, G., L. Kaleschke and G. Heygster (2008), Sea ice remote sensing using AMSR-E 89 GHz channels, J. Geophys. Res. 113, C02S03, doi:10.1029/2005JC003384. Data: University of Bremen, https://seaice.uni-bremen.de"
+  },
+  {
+   "id": "asi-n6250-20260911",
+   "hemisphere": "Arctic",
+   "observed": "2026-09-11",
+   "parameter": "sea ice concentration",
+   "units": "percent",
+   "mode": "MEAS",
+   "instrument": "AMSR2 (GCOM-W1), 89 GHz",
+   "algorithm": "ARTIST Sea Ice (ASI) v5.4",
+   "producer": "Institute of Environmental Physics, University of Bremen",
+   "resolution_m": 6250,
+   "epsg": 3413,
+   "width": 1216,
+   "height": 1792,
+   "encoding": {
+    "file": "asi-n6250-20260911.png",
+    "bytes": 132491,
+    "type": "8-bit PNG, row 0 = north edge of the GeoTransform",
+    "code_to_value": "concentration_percent = code / 2",
+    "no_value_code": 255,
+    "quantisation_step_pct": 0.5,
+    "worst_quantisation_error_pct": 0.249996
+   },
+   "statistics": {
+    "extent_km2": 4318234.6,
+    "area_km2": 3513123.3,
+    "extent_threshold_pct": 15.0,
+    "cells_with_value": 1049405,
+    "cells_no_value": 1129667,
+    "nominal_cell_km2": 39.0625,
+    "true_cell_km2_range": [
+     23.8727,
+     41.5282
+    ]
+   },
+   "source": {
+    "label": "asi-n6250-20260911",
+    "url": "https://data.seaice.uni-bremen.de/amsr2/asi_daygrid_swath/n6250/netcdf/2026/asi-AMSR2-n6250-20260911-v5.4.nc",
+    "retrieved_utc": "2026-09-12T13:48:35Z",
+    "http_last_modified": "Sat, 12 Sep 2026 04:37:28 GMT",
+    "bytes": 647096,
+    "sha256": "29697553b2318ec6933e4d97238b442f714cced47a9ec3c02141c0be901d7d17"
+   },
+   "geometry": {
+    "declared_crs": {
+     "grid_mapping_name": "polar_stereographic",
+     "standard_parallel": 70.0,
+     "straight_vertical_longitude_from_pole": -45.0,
+     "semi_major_axis": 6378137.0,
+     "inverse_flattening": 298.257223563,
+     "GeoTransform": "-3850000 6250 0 5850000 0 -6250"
+    },
+    "y_axis_was_ascending": true,
+    "source_history": "Sat Sep 12 06:37:28 2026: GDAL CreateCopy( /mnt/web//data/amsr2/asi_daygrid_swath/n6250/netcdf/2026/asi-AMSR2-n6250-20260911-v5.4.nc, ... )\ngrdmath /mnt/web//data/amsr2/asi_daygrid_swath/n6250/2026/sep/Arctic//asi-AMSR2-n6250-20260911-v5.4.hdf FLIPUD = tmp1.nc",
+    "source_info": "AMSR2 sea ice concentration based on the ASI algorithm (Spreen et al.,2008). www.seaice.uni-bremen.de",
+    "source_author": "University of Bremen, Gunnar Spreen [gunnar.spreen@uni-bremen.de], Christian Melsheimer [melsheim@uni-bremen.de]"
+   },
+   "citation": "Spreen, G., L. Kaleschke and G. Heygster (2008), Sea ice remote sensing using AMSR-E 89 GHz channels, J. Geophys. Res. 113, C02S03, doi:10.1029/2005JC003384. Data: University of Bremen, https://seaice.uni-bremen.de"
+  }
+ ]
+}

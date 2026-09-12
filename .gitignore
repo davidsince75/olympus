@@ -1,10 +1,23 @@
+# Olympus — what does not belong in the repository.
+
+# Working scratch. Git on the session's mount cannot delete its own lock files,
+# so they get moved here instead; the folder is deleted by hand.
 _to_delete/
 *.lock
 
-node_modules/
-*.bak
-atlas.stripped.html
+# Session outputs: screenshots and renders Claude produced while working.
+# Useful to look at, not worth 3 MB of history — the surfaces themselves are
+# the record, and they are committed.
+Claude outputs/
+dist/*.png
+dist/_ice_wrapped.html
 
+# Run logs from push_to_github.ps1.
+push_log.txt
+
+# Build and editor droppings.
 node_modules/
+__pycache__/
+*.py[cod]
 *.bak
 atlas.stripped.html

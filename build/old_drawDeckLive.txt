@@ -1,0 +1,67 @@
+function drawDeckLive(g,cx,cy,s,S){
+  if(typeof LIVE === "undefined" || !LIVE) return;
+  g.save(); g.beginPath(); g.arc(cx,cy,s,0,7); g.clip();
+
+  // --- aurora ---
+  const A = LIVE.aurora, grid = st.lay.aur ? deckAurora(S) : null;
+  if(A && grid){
+    const sgn = S ? -1 : 1;
+    g.globalCompositeOperation = "lighter";
+    for(let li=0; li<A.nlat-1; li++){
+      const lat = A.lat0 + li;
+      for(let lo=0; lo<A.nlon; lo+=2){
+        const v = Math.max(grid[li*A.nlon+lo], grid[li*A.nlon+((lo+1)%A.nlon)]);
+        if(v < 4) continue;
+        const a0 = xy(g,cx,cy,s,S,sgn*lat,lo),      a1 = xy(g,cx,cy,s,S,sgn*lat,lo+2);
+        const a2 = xy(g,cx,cy,s,S,sgn*(lat+1),lo+2), a3 = xy(g,cx,cy,s,S,sgn*(lat+1),lo);
+        const k = Math.min(1,(v-3)/18);
+        g.fillStyle = `rgba(${Math.round(60+165*k*k)},${Math.round(226-70*k*k)},${Math.round(180+60*k)},${(0.02+0.34*k*k).toFixed(3)})`;
+        g.beginPath(); g.moveTo(a0[0],a0[1]); g.lineTo(a1[0],a1[1]); g.lineTo(a2[0],a2[1]); g.lineTo(a3[0],a3[1]);
+        g.closePath(); g.fill();
+      }
+    }
+    g.globalCompositeOperation = "source-over";
+  }
+
+  // --- SAR footprints ---
+  const SR = LIVE.sar;
+  if(st.lay.sar1 && SR && SR.items){
+    const want = S ? "sh" : "nh", now = Date.now();
+    for(const it of SR.items){
+      if(it.hemi !== want) continue;
+      const pts = it.poly.map(([lon,lat]) => xy(g,cx,cy,s,S,lat,lon));
+      if(pts.length < 3) continue;
+      const fresh = Math.max(0, 1 - (now - Date.parse(it.start))/3600000/18);
+      g.beginPath(); g.moveTo(pts[0][0],pts[0][1]);
+      for(let i=1;i<pts.length;i++) g.lineTo(pts[i][0],pts[i][1]);
+      g.closePath();
+      g.fillStyle   = `rgba(155,118,220,${(0.05+0.13*fresh).toFixed(3)})`;
+      g.strokeStyle = `rgba(200,155,232,${(0.20+0.55*fresh).toFixed(2)})`;
+      g.lineWidth = 0.7 + fresh*0.9;
+      g.fill(); g.stroke();
+    }
+  }
+
+  // --- ice drift ---
+  const DR = LIVE.drift && LIVE.drift[S ? "sh" : "nh"];
+  if(st.lay.drift && DR && DR.v){
+    g.lineCap = "round";
+    const X = st.driftX || 1;
+    for(const [la0,lo0,la1,lo1] of DR.v){
+      const p = xy(g,cx,cy,s,S,la0,lo0), q0 = xy(g,cx,cy,s,S,la1,lo1);
+      const qx = p[0] + (q0[0]-p[0])*X, qy = p[1] + (q0[1]-p[1])*X;
+      const dx = qx-p[0], dy = qy-p[1], len = Math.hypot(dx,dy);
+      if(len < 0.6) continue;
+      const k = Math.min(1, len/(s*0.045*X));
+      g.strokeStyle = `rgba(${Math.round(127+90*k)},${Math.round(227-40*k)},245,${(0.32+0.5*k).toFixed(2)})`;
+      g.lineWidth = 0.8 + 0.9*k;
+      g.beginPath(); g.moveTo(p[0],p[1]); g.lineTo(qx,qy); g.stroke();
+      const ux = dx/len, uy = dy/len, hl = Math.min(4.5, len*0.42);
+      g.beginPath();
+      g.moveTo(qx,qy); g.lineTo(qx-ux*hl-uy*hl*0.5, qy-uy*hl+ux*hl*0.5);
+      g.moveTo(qx,qy); g.lineTo(qx-ux*hl+uy*hl*0.5, qy-uy*hl-ux*hl*0.5);
+      g.stroke();
+    }
+  }
+  g.restore();
+}

@@ -21,3 +21,5 @@ __pycache__/
 *.py[cod]
 *.bak
 atlas.stripped.html
+
+build/shots/

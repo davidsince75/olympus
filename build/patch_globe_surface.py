@@ -432,9 +432,13 @@ sub("bluemarble explainer provenance",
 
 sub("truecolor explainer",
     "It is a near-real-time product, not the science-grade surface reflectance.\",",
-    "It is a near-real-time product, not the science-grade surface reflectance. On the globe you "
-    "are looking at one day of a single instrument, so the black wedges between the orbit swaths "
-    "at low latitudes are where Terra had not passed yet — real gaps, left as gaps.\",")
+    "It is a near-real-time product, not the science-grade surface reflectance. The discs show "
+    "<b>one day</b>: near the poles Terra’s orbits converge and overlap, so a day is complete "
+    "there. The globe cannot be — at the equator consecutive orbits leave un-imaged wedges "
+    "between them, 11 % of the tropics in a single day — so its sheet is composited over "
+    "<b>two days</b>, each pixel taken from the more recent day that imaged it. Two is what it "
+    "takes; more would only age the picture. What is still black is <b>polar night</b>, and no "
+    "number of days will fill that.\",")
 
 # ------------------------------------------------------------- 10. dead code
 sub("dead schematic SAR block", """  if(st.lay.sar){
@@ -457,11 +461,32 @@ sub("dead schematic SAR block", """  if(st.lay.sar){
 # a static composite with no date.
 sub("imagery date, first paint",
     '{ const L0 = deckBaseLayer(); const el=$("#imgDay"); if(el) el.textContent = (L0 && L0.day) ? L0.day : "static composite"; }',
-    '{ const L0 = deckBaseLayer(); const el=$("#imgDay"); if(el) el.textContent = (L0 && L0.time) ? L0.time : "static composite"; }')
+    'imgNote();')
 
 sub("imagery date, on switch",
     '{ const L = deckBaseLayer(); $("#imgDay").textContent = (L && L.day) ? L.day : "static composite"; }',
-    '{ const L = deckBaseLayer(); $("#imgDay").textContent = (L && L.time) ? L.time : "static composite"; }')
+    'imgNote();')
+
+# The readout must say what is on screen. The polar squares are one day: near the
+# poles Terra's orbits converge and overlap, so a day is complete there. The
+# globe's sheet is composited over two, because at the equator consecutive orbits
+# leave un-imaged wedges between them. Reporting "one day" while drawing two would
+# be the same class of error as the `day` field this used to read.
+sub("imgNote",
+    "function projLabel(){",
+    """function imgNote(){
+  const el=$("#imgDay"); if(!el) return;
+  const L=deckBaseLayer();
+  if(!L){ el.textContent=""; return; }
+  const gd = (st.mode==="GLOBE" && st.lay.sat && L.gdays && L.gdays.length>1) ? L.gdays : null;
+  el.textContent = gd ? (gd[gd.length-1]+" \u2192 "+gd[0]+" \u00b7 "+gd.length+"-day composite")
+                      : (L.time ? L.time : "static composite");
+}
+function projLabel(){""")
+
+sub("imgNote follows the view",
+    "  projLabel();\n\n  // the stream describes the month on screen, so it moves with it",
+    "  projLabel(); imgNote();\n\n  // the stream describes the month on screen, so it moves with it")
 
 sub("imagery date, feed row",
     'if(bl)       F.push(["GIBS imagery", bl.day || "static", "live", bl.key === "today" ? "truecolor" : "bluemarble"]);',
@@ -493,13 +518,21 @@ def patch_satimg(src, img_dir):
         L["g"] = data_uri(os.path.join(img_dir, rec["file"]))
         L["gw"] = rec["width"]
         L["gh"] = rec["height"]
+        L["gdays"] = rec.get("days") or ([rec["time"]] if rec.get("time") else [])
         L["gsrc"] = {"projection": rec["projection"], "time": rec["time"],
-                     "bytes": rec["bytes"], "source": rec["source"]}
-        added.append(f"{L['key']} {rec['width']}x{rec['height']} {rec['bytes']/1024:.0f} KB")
+                     "days": rec.get("days"), "composite": rec.get("composite"),
+                     "unimaged_fraction": rec.get("unimaged_fraction"),
+                     "bytes": rec["bytes"], "sources": rec.get("sources") or rec.get("source")}
+        nd = len(L["gdays"])
+        added.append(f"{L['key']} {rec['width']}x{rec['height']} {rec['bytes']/1024:.0f} KB"
+                     + (f" ({nd}-day composite)" if nd > 1 else ""))
     sat["note"] = sat["note"] + (
         " The globe cannot use either square — they stop at r = rmax, latitude 33 N and 26 S — "
         "so it is drawn from a global EPSG:4326 sheet of the same GIBS layer, resampled per "
-        "screen cell.")
+        "screen cell. A single day of MODIS Terra is complete on the polar squares, where the "
+        "orbits converge, and is not complete globally, so the timed global sheet is composited "
+        "over two days - each pixel from the more recent day that imaged it. What remains black "
+        "is polar night.")
     sj = json.dumps(sat, separators=(",", ":"))
     m = hits[0]
     out = src[:m.start()] + f"const SATIMG = {sj};" + src[m.end():]

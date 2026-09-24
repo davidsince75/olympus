@@ -1,6 +1,7 @@
 const { chromium } = require("playwright");
-const fs=require("fs");
-const SRC = process.argv[2] || "../src/deck.html";
+const fs=require("fs"), path=require("path");
+// src/ was retired on 24 Sep 2026; dist/deck.html is what is published
+const SRC = path.resolve(process.argv[2] || path.join(__dirname,"..","dist","deck.html"));
 const HARNESS = '\nwindow.__oly=()=>({st,setMode,setCam,OC,CAM,hideEx,layers,drawMap,paintAll,LAYERS,sync,map,mctx,allReady:(typeof allReady!=="undefined"?allReady:null)});\n';
 const ANCHOR="\nrequestAnimationFrame(frame);\n})();\n</script>";
 const SKELETON = (body) => `<!doctype html><html><head><meta charset="utf-8">
@@ -11,7 +12,7 @@ const SKELETON = (body) => `<!doctype html><html><head><meta charset="utf-8">
 (async()=>{
   const raw=fs.readFileSync(SRC,"utf8");
   const wired=raw.replace(ANCHOR,"\nrequestAnimationFrame(frame);\n"+HARNESS+"})();\n</script>");
-  const p="../build/_probe_layers.html";
+  const p=path.join(__dirname,"..","build","_probe_layers.html");
   fs.writeFileSync(p, SKELETON(wired));
   const b=await chromium.launch({executablePath:"/opt/pw-browsers/chromium-1194/chrome-linux/chrome", args:["--no-sandbox"]});
   const pg=await b.newPage({viewport:{width:1500,height:1000}});

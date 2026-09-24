@@ -1,13 +1,13 @@
 const { chromium } = require("playwright");
-const fs=require("fs");
-const SRC=process.argv[2];
+const fs=require("fs"), path=require("path");
+const SRC=path.resolve(process.argv[2] || path.join(__dirname,"..","dist","deck.html"));
 const HARNESS='\nwindow.__oly=()=>({st,setMode,setCam,OC,CAM,DISC,hideEx,drawMap,map,mctx,discZoom,discReset,zoomOf,modeUI});\n';
 const ANCHOR="\nrequestAnimationFrame(frame);\n})();\n</script>";
 const SK=b=>`<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0}[hidden]{display:none!important}</style></head><body>${b}</body></html>`;
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 (async()=>{
   const raw=fs.readFileSync(SRC,"utf8");
-  const p="../build/_probe_zoom.html";
+  const p=path.join(__dirname,"..","build","_probe_zoom.html");
   fs.writeFileSync(p,SK(raw.replace(ANCHOR,"\nrequestAnimationFrame(frame);\n"+HARNESS+"})();\n</script>")));
   const b=await chromium.launch({executablePath:"/opt/pw-browsers/chromium-1194/chrome-linux/chrome",args:["--no-sandbox"]});
   const pg=await b.newPage({viewport:{width:1500,height:1000}});

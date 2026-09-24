@@ -35,6 +35,9 @@ function $(sel){ return sel === '#tip' ? TIP : { style:{}, innerHTML:'' }; }
 let HOT = [{ id:'aq-concordia', x:400, y:300, r:10 }];
 const BY = new Map([['aq-concordia', {name:'Concordia', operator:'IPEV', seasonality:'Year-Round', _kind:'station'}]]);
 function esc(s){ return String(s); }
+// The learning layer (5 Sep) made the hover path call hideEx(); without a stub the
+// mouse-hover assertion failed on a ReferenceError from then on. Stubbed 24 Sep 2026.
+function hideEx(){} function showEx(){}
 function invLat(){ return -75; }
 function invLon(){ return 123; }
 function layout(){

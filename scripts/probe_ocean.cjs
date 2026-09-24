@@ -457,11 +457,9 @@ const ok = (name, cond, detail) => {
   console.log("  wrote mobile.png");
   const mob = await page.evaluate(() => ({ n: window.__oly().OC.nPart, wide: document.documentElement.scrollWidth }));
   ok("particle count adapts to a narrow viewport", mob.n <= 2400, `${mob.n} particles at 420 px`);
-  // the feed strip overflows at phone width in the shipped deck too; this probe
-  // asserts only that the ocean plane did not make it worse
-  ok("no horizontal overflow the ocean plane is responsible for",
-     mob.wide <= 510, `document is ${mob.wide} px wide at 420 px — the .feed strip, ` +
-     `unchanged from before this work (pre-existing, needs overflow-x on the strip)`);
+  // Was: "no overflow the ocean plane is responsible for", passing at 507 px in
+  // a 420 px viewport. A probe that excuses a defect stops the defect being fixed.
+  ok("no horizontal overflow at phone width", mob.wide <= 420, `document is ${mob.wide} px wide at 420 px`);
 
   console.log("\n-- the footer tells the truth --");
   const led = await page.evaluate(() => {

@@ -23,3 +23,12 @@ __pycache__/
 atlas.stripped.html
 
 build/shots/
+
+# Probe and build scratch (24 Sep 2026)
+build/_probe_*.html
+build/_phone_*.html
+site/
+data/events/
+node_modules/
+package-lock.json
+shots/

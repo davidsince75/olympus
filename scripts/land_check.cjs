@@ -4,7 +4,8 @@ const HARNESS='window.__oly=()=>({OCEAN,isLand});\n';
 const ANCHOR="\nrequestAnimationFrame(frame);\n})();\n</script>";
 (async()=>{
   const raw=fs.readFileSync(process.argv[2],"utf8");
-  const p=path.join("build/shots","lc.html");
+  const p=path.join(__dirname,"..","build","shots","lc.html");
+  fs.mkdirSync(path.dirname(p),{recursive:true});
   fs.writeFileSync(p, raw.replace(ANCHOR,"\nrequestAnimationFrame(frame);\n"+HARNESS+"})();\n</script>"));
   const b=await chromium.launch({executablePath:"/opt/pw-browsers/chromium"});
   const pg=await b.newPage();

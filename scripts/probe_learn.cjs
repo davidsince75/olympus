@@ -55,7 +55,13 @@ else ok(staticRefs.size + " distinct data-ex targets in markup, all resolve");
 
 // --- 4. every data-ex written from JS literals resolves
 const jsRefs = new Set();
-for (const mm of html.matchAll(/ex\s*:\s*"([a-z0-9_]+)"/g)) jsRefs.add(mm[1]);
+// a literal followed by "+" is a key prefix, completed at runtime: it resolves if
+// the page generates entries under that prefix (EXPL["node_"+id] = {...})
+const prefixes = new Set();
+for (const mm of html.matchAll(/ex\s*:\s*"([a-z0-9_]+)"\s*\+/g)) prefixes.add(mm[1]);
+for (const mm of html.matchAll(/ex\s*:\s*"([a-z0-9_]+)"(?!\s*\+)/g)) jsRefs.add(mm[1]);
+// feed chips: the explainer key is the last element of each F.push([...])
+for (const mm of html.matchAll(/F\.push\(\[[^\n]*?,\s*"([a-z0-9_]+)"\s*\]\)/g)) jsRefs.add(mm[1]);
 for (const mm of html.matchAll(/"live"\s*,\s*"([a-z0-9_]+)"\]/g)) jsRefs.add(mm[1]);
 for (const mm of html.matchAll(/"warn"\s*,\s*"([a-z0-9_]+)"\]/g)) jsRefs.add(mm[1]);
 for (const mm of html.matchAll(/setAttribute\("data-ex"\s*,\s*"([a-z0-9_]+)"\)/g)) jsRefs.add(mm[1]);
@@ -63,6 +69,11 @@ for (const mm of html.matchAll(/setAttribute\("data-ex"\s*,\s*"([a-z0-9_]+)"\)/g
 for (const mm of html.matchAll(/data-ex="([a-z0-9_]+)"/g)) jsRefs.add(mm[1]);
 
 const jsBad = [...jsRefs].filter(k => !EXPL[k]);
+for (const pre of prefixes) {
+  const gen = new RegExp('EXPL\\["' + pre + '"\\s*\\+[^\\]]+\\]\\s*=').test(html);
+  if (gen) ok(`prefix "${pre}*" is generated at runtime, so references to it resolve`);
+  else jsBad.push(pre + "*");
+}
 if (jsBad.length) bad("script points at undefined entries: " + jsBad.join(", "));
 else ok(jsRefs.size + " distinct data-ex targets in script, all resolve");
 

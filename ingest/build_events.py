@@ -15,6 +15,7 @@ Four sources, no account and no key on any of them:
   kp      NOAA SWPC planetary K index, 1-minute     ~1 min    MEAS
   drift   EUMETSAT OSI SAF OSI-405 low-res drift    ~2 days   MEAS  (flag 30 only)
   sar     Copernicus Data Space, Sentinel-1         ~3 h      MEAS  (footprints)
+  enso    NOAA CPC + OISST v2.1 — the featured event, see ingest/enso.py
 
 Every layer carries its own observation time. The build time is recorded once,
 in `meta.built`, and is never shown as the age of anything.
@@ -289,6 +290,10 @@ def main():
     L["kp"] = kp()
     L["drift"] = drift()
     L["sar"] = sar()
+    # the featured event (ingest/enso.py): NOAA's status, indices and this week's
+    # SST anomaly field, cross-checked against CPC before it is accepted
+    from enso import enso
+    L["enso"] = enso()
     if a.prev:
         P = prev_live(a.prev)
         if "gibs" in P:
@@ -303,6 +308,10 @@ def main():
         D = L["drift"][h]
         print(f"drift   {h} {D['t0']} -> {D['t1']}  {D['n']} nominal vectors")
     print(f"sar     {L['sar']['n']} acquisitions since {L['sar']['since']}")
+    E = L["enso"]
+    print(f"enso    {E['status']['alert']} ({E['status']['issued']}) · Niño-3.4 week {E['weekly']['week']} "
+          f"relative {E['weekly']['rel']['nino34']:+.1f} / traditional {E['weekly']['trad34']:+.1f} · "
+          f"box check {E['field']['n34_check']:+.2f} · RONI {E['roni']['last']} {E['roni']['latest']:+.2f}")
     print(f"wrote {a.out}  {len(txt)/1e3:.0f} KB")
 
 

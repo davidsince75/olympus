@@ -30,7 +30,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install numpy netCDF4
+      - run: pip install numpy netCDF4 contourpy
       - name: Rebuild the living layer from source
         # A source being down must not take the site down: without a fresh
         # payload the site ships the one in dist/, which states its own age.

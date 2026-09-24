@@ -72,6 +72,25 @@ for (const f of SURFACES) {
   const m = s.match(/const LAYERS=\[([\s\S]*?)\n\];/);
   const simOn = m ? m[1].split('\n').filter((l) => /sim:true/.test(l) && /on:true/.test(l)).map((l) => (l.match(/id:"(\w+)"/) || [])[1]) : ['?'];
   rec('deck opens on what is measured (no SIM layer on at open)', m && simOn.length === 0, simOn.join(', '));
+  // the opening view (24 Sep 2026): globe, Temp, season, over the Pacific, El Niño featured
+  rec('deck opens on the globe, coloured by temperature, season on',
+      /const st=\{ S:true, mode:"GLOBE"/.test(s) && /flowCol:"temp", flowSeason:true/.test(s)
+      && /data-mode="GLOBE" aria-pressed="true"/.test(s) && /data-fc="temp"\s+aria-pressed="true"/.test(s));
+  {
+    const i = s.indexOf('\nconst LIVE = ') + 14, j = s.indexOf('\n', i);
+    const L = JSON.parse(s.slice(i, j).replace(/;\s*$/, ''));
+    const E = L.enso;
+    rec('the featured event carries NOAA data', !!E && !!E.status && /^(Final )?(El Niño|La Niña) (Advisory|Watch)$|^Not Active$/.test(E.status.alert),
+        E ? `${E.status.alert}, issued ${E.status.issued}` : 'no LIVE.enso');
+    if (E) {
+      const age = (Date.now() - Date.parse(E.weekly.week + 'T12:00:00Z')) / 864e5;
+      rec('the weekly Niño-3.4 is at most three weeks old', age < 21, `week of ${E.weekly.week}, ${age.toFixed(0)} d`);
+      rec('the anomaly field reproduces CPC\'s weekly Niño-3.4', Math.abs(E.field.n34_check - E.weekly.trad34) <= 0.25,
+          `box ${E.field.n34_check} vs CPC ${E.weekly.trad34}`);
+      rec('the anomaly field has contours to draw', E.field.contours.some((c) => c.lines.length > 0),
+          E.field.contours.map((c) => `${c.level > 0 ? '+' : ''}${c.level}: ${c.lines.length}`).join(', '));
+    }
+  }
   const retired = ['Ines Halvorsen', 'Uncertainty is drawn, not hidden', 'last 18 h', 'the engine is visible'];
   const found = retired.filter((t) => s.includes(t));
   rec('deck carries none of the retired claims', found.length === 0, found.join(', '));
@@ -91,8 +110,13 @@ run('every layer switch changes the picture', ['scripts/probe_layers.cjs', 'dist
   let R; try { R = JSON.parse(j.replace(/\nERRORS:[\s\S]*$/, '')); } catch (e) { return { ok: false, detail: 'unparsable output' }; }
   const errs = /ERRORS: \[\]/.test(o);
   const S = R.S || R[Object.keys(R)[0]];
-  const inert = Object.entries(S.layers).filter(([k, v]) => v <= (S.noise || 0) && k !== 'track').map(([k]) => k);
-  return { ok: errs && inert.length === 0, detail: inert.length ? `inert on the Antarctic disc: ${inert.join(', ')}` : 'all 13 draw on the Antarctic disc' };
+  // the ground track is a globe-less placeholder; El Niño is tropical and lives on the globe
+  const inert = Object.entries(S.layers).filter(([k, v]) => v <= (S.noise || 0) && k !== 'track' && k !== 'enso').map(([k]) => k);
+  const G = R.GLOBE || {};
+  const ensoInk = G.layers ? G.layers.enso : undefined;
+  const ok = errs && inert.length === 0 && (ensoInk === undefined || ensoInk > (G.noise || 0));
+  return { ok, detail: (inert.length ? `inert on the Antarctic disc: ${inert.join(', ')}` : `${Object.keys(S.layers).length - 2} draw on the Antarctic disc`)
+                     + (ensoInk !== undefined ? `; El Niño contours on the globe: ${ensoInk} px` : '') };
 });
 run('disc and globe zoom', ['scripts/probe_zoom.cjs', 'dist/deck.html'], (o) => ({ ok: /"errors": \[\]/.test(o) && /"pct_G_reset": "100%"/.test(o) }));
 

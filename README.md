@@ -35,6 +35,7 @@ survives. Recent ones, in the order they were applied:
     build/patch_disc_zoom.py     13 Sep     zoom and pan on the discs
     build/patch_aurora.py        14 Sep     an aurora you can see
     build/patch_audit.py         24 Sep     the audit: honesty, first view, phones, Named Ice hero
+    build/patch_feature_enso.py  24 Sep     opens on the globe over the Pacific; El Niño featured
 
 ## The living layer
 
@@ -50,6 +51,17 @@ against the payload shape the surfaces already read.
 An artifact cannot fetch at runtime, and its share link is **pinned to a version**, so a republish is
 invisible to link-holders until the pin is moved from the artifact's share menu. The living layer can
 only stay current in public through the site.
+
+## The featured event — El Niño, 2026
+
+The deck opens on the globe, coloured by temperature, season on, over the equatorial
+Pacific, with El Niño as a featured event (`build/patch_feature_enso.py`).
+`ingest/enso.py` (run by `build_events.py`) bakes NOAA CPC's alert status and synopsis
+verbatim, the weekly relative and traditional Niño-3.4, the official RONI since 1950,
+NOAA's stated probabilities verbatim, and this week's OISST anomaly over the tropical
+Pacific as contours. The field's Niño-3.4 box mean must reproduce CPC's weekly value to
+within 0.25 °C or the build stops. The Temp colouring is a forty-year mean that cannot
+show El Niño, which is why the event carries its own contours.
 
 ## The public site
 

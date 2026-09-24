@@ -1,0 +1,52 @@
+# Olympus — the public site, rebuilt every morning.
+#
+# Why: a claude.ai artifact cannot fetch, and its share link is pinned to a
+# version, so a republished artifact stays invisible until the pin is moved by
+# hand. This publishes the same three surfaces to GitHub Pages, and rebuilds the
+# living layer (aurora, Kp, ice drift, Sentinel-1 footprints) from source each
+# day, so the public copy is never older than a day and says its own age.
+#
+# Needs, once: Settings -> Pages -> Source: "GitHub Actions". Pages on a private
+# repository needs a paid plan; otherwise make the repository public.
+name: Publish Olympus
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "30 6 * * *"      # 06:30 UTC daily
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install numpy netCDF4
+      - name: Rebuild the living layer from source
+        # A source being down must not take the site down: without a fresh
+        # payload the site ships the one in dist/, which states its own age.
+        continue-on-error: true
+        run: python ingest/build_events.py data/events/live.json --prev dist/deck.html
+      - name: Assemble the site
+        run: python build/build_site.py site --live data/events/live.json
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -36,6 +36,8 @@ survives. Recent ones, in the order they were applied:
     build/patch_aurora.py        14 Sep     an aurora you can see
     build/patch_audit.py         24 Sep     the audit: honesty, first view, phones, Named Ice hero
     build/patch_feature_enso.py  24 Sep     opens on the globe over the Pacific; El Niño featured
+    build/patch_decklog.py       24 Sep     the Deck log: the record as tables, CSV, sources, checks
+    build/patch_running_mean.py  24 Sep     the timeline's running mean is twelve months or nothing
 
 ## The living layer
 
@@ -62,6 +64,29 @@ NOAA's stated probabilities verbatim, and this week's OISST anomaly over the tro
 Pacific as contours. The field's Niño-3.4 box mean must reproduce CPC's weekly value to
 within 0.25 °C or the build stops. The Temp colouring is a forty-year mean that cannot
 show El Niño, which is why the event carries its own contours.
+
+## The Deck log
+
+`Log` in the deck's header (or the `L` key) opens the record behind the picture, as tables, over the
+three columns, with the transport still live so the dial drives it (`build/patch_decklog.py`, code in
+`build/decklog/`). **This month**: every value the deck holds for the month on the dial, its product,
+file and status, and what each layer is actually showing for that month. **Series**: sea-ice extent
+(both hemispheres, gaps as NO OBS rows), the 1991–2020 climatology, RAPID, RONI, weekly Niño-3.4, the
+NSIDC reference points and Kp, each with a CSV. **Sources**: product, version, DOI, licence, coverage,
+every step from published value to pixel, and dated checks.
+
+**The deck's extent is not OSI SAF's published extent.** The deck counts cells ≥ 15 % in the month's
+mean concentration field; OSI SAF and NSIDC average the daily extents. The deck runs 0.36 (Arctic) and
+0.53 (Antarctic) million km² higher on average, up to 1.5. The log carries OSI SAF's Sea Ice Index v3.0
+beside the deck's number as a reference, never merged.
+
+    python ingest/fetch_sie_index.py data/osi/sie_index_v3p0.json     # OSI SAF's published index
+    python ingest/check_sources.py dist/deck.html data/checks/sources.json   # re-derive from the publishers' files
+    python build/patch_decklog.py --refresh                           # renew the log's payload only
+
+Run all three whenever the OSI SAF record is refreshed; `verify` fails once the checks are 45 days old.
+Inside claude.ai the CSV is saved through the viewer's own save, so the deck is published with the
+`downloads` capability declared.
 
 ## The public site
 
@@ -98,7 +123,11 @@ surfaces on a 390 px phone. It needs Chromium at `/opt/pw-browsers` (Claude's bu
   the deck moved to EPSG:3413/3976 on 12 Sep. The same station sits in a different place on the two
   surfaces.
 - The deck's station layer is 20 hard-coded sites, not the Atlas register.
-- The deck is 12.8 MiB of a 16 MiB artifact cap. Two more measured layers fill it.
+- The deck is 12.9 MiB of a 16 MiB artifact cap. Two more measured layers fill it.
+- The newest month (Aug 2026) is on the deck from the fast-track files; the consolidated files have
+  existed since 16 Sep (−0.013 Arctic, −0.009 Antarctic). The OSI record needs a refresh.
+- The RAPID monthly means were made by a script that is not in the repository. They are reproduced
+  exactly from `moc_transports.nc` by `ingest/check_sources.py`, but not rebuilt by anything here.
 - The builds are a chain of in-place patches on a 13 MB file; there is no build that goes from data to
   page in one step.
 

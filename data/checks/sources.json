@@ -1,0 +1,127 @@
+{
+ "checked_utc": "2026-09-24T11:54:17Z",
+ "by": "ingest/check_sources.py",
+ "extent_method": [
+  {
+   "hemi": "sh",
+   "ym": "201912",
+   "record": "cdr-v3p0",
+   "days": 31,
+   "monthly_field": 11.148,
+   "daily_mean_ge15": 9.849,
+   "daily_mean_gt15": 9.848,
+   "published_index": 9.849
+  },
+  {
+   "hemi": "nh",
+   "ym": "201209",
+   "record": "cdr-v3p0",
+   "days": 30,
+   "monthly_field": 4.117,
+   "daily_mean_ge15": 3.997,
+   "daily_mean_gt15": 3.997,
+   "published_index": 3.994
+  },
+  {
+   "hemi": "nh",
+   "ym": "202606",
+   "record": "icdr-v3p0-amsr",
+   "days": 30,
+   "monthly_field": 10.51,
+   "daily_mean_ge15": 10.007,
+   "daily_mean_gt15": 10.007,
+   "published_index": 10.851
+  },
+  {
+   "hemi": "sh",
+   "ym": "202606",
+   "record": "icdr-v3p0-amsr",
+   "days": 30,
+   "monthly_field": 12.991,
+   "daily_mean_ge15": 12.363,
+   "daily_mean_gt15": 12.362,
+   "published_index": 12.683
+  }
+ ],
+ "fast_track": [
+  {
+   "hemi": "nh",
+   "ym": "202608",
+   "fast_track_file": "ice_conc_nh_ease2-250_icdrft-v3p0-amsr_202608.nc",
+   "fast_track": 5.787,
+   "fast_track_created": "2026-09-01",
+   "deck": 5.787,
+   "consolidated_file": "ice_conc_nh_ease2-250_icdr-v3p0-amsr_202608.nc",
+   "consolidated": 5.774,
+   "consolidated_created": "2026-09-16"
+  },
+  {
+   "hemi": "sh",
+   "ym": "202608",
+   "fast_track_file": "ice_conc_sh_ease2-250_icdrft-v3p0-amsr_202608.nc",
+   "fast_track": 17.352,
+   "fast_track_created": "2026-09-01",
+   "deck": 17.352,
+   "consolidated_file": "ice_conc_sh_ease2-250_icdr-v3p0-amsr_202608.nc",
+   "consolidated": 17.343,
+   "consolidated_created": "2026-09-16"
+  }
+ ],
+ "rapid": {
+  "url": "https://rapid.ac.uk/sites/default/files/rapid_data/moc_transports.nc",
+  "sha256": "ba135d9447a87c2bf5dcc8870e2cb73ff348c412fa1bc3501145e01c79788eed",
+  "bytes": 1182284,
+  "version": "v2024.1a",
+  "created": "22-Jan-2026",
+  "doi": "doi: 10.5285/48d0bf43-0598-ceb2-e063-7086abc062f1",
+  "samples": 14599,
+  "first": "2004-04-02",
+  "last": "2024-03-27",
+  "vars": {
+   "moc": {
+    "source": "moc_mar_hc10",
+    "months": 240,
+    "equal": 240,
+    "fill_samples": 20,
+    "mismatch": []
+   },
+   "gs": {
+    "source": "t_gs10",
+    "months": 240,
+    "equal": 240,
+    "fill_samples": 20,
+    "mismatch": []
+   },
+   "ek": {
+    "source": "t_ek10",
+    "months": 240,
+    "equal": 240,
+    "fill_samples": 20,
+    "mismatch": []
+   },
+   "umo": {
+    "source": "t_umo10",
+    "months": 240,
+    "equal": 240,
+    "fill_samples": 20,
+    "mismatch": []
+   }
+  }
+ },
+ "enso": {
+  "roni": {
+   "url": "https://www.cpc.ncep.noaa.gov/data/indices/RONI.ascii.txt",
+   "values": 919,
+   "equal": 919,
+   "source_values": 919
+  },
+  "weekly": {
+   "url": "https://www.cpc.ncep.noaa.gov/data/indices/rel_wksst9120.txt",
+   "values": 157,
+   "equal": 157,
+   "first": "2023-09-20",
+   "last": "2026-09-16"
+  },
+  "live_built": "2026-09-24T08:36:07Z"
+ }
+}

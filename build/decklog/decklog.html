@@ -1,0 +1,19 @@
+    <section class="dlog" id="dlog" hidden aria-label="Deck log">
+      <div class="dlog-hd">
+        <h2 data-ex="deck_log">Deck log</h2>
+        <div class="dlog-step" role="group" aria-label="Month">
+          <button type="button" id="dlogPrev" aria-label="Previous month">&#9664;</button>
+          <div class="dlog-ym" id="dlogYm" aria-live="polite">——<small>—</small></div>
+          <button type="button" id="dlogNext" aria-label="Next month">&#9654;</button>
+          <button type="button" class="txt" id="dlogLatest">Latest</button>
+        </div>
+        <div class="dlog-tabs" role="tablist" aria-label="Log view">
+          <button type="button" role="tab" id="dlogTabFrame" data-tab="frame" aria-selected="true" aria-controls="dlogBody">This month</button>
+          <button type="button" role="tab" id="dlogTabSeries" data-tab="series" aria-selected="false" aria-controls="dlogBody">Series</button>
+          <button type="button" role="tab" id="dlogTabManifest" data-tab="manifest" aria-selected="false" aria-controls="dlogBody">Sources</button>
+        </div>
+        <div class="dlog-stamp" id="dlogStamp" data-ex="log_build"></div>
+        <button type="button" class="dlog-x" id="dlogClose" aria-label="Close the log">&times;</button>
+      </div>
+      <div class="dlog-bd" id="dlogBody" role="tabpanel" tabindex="-1"></div>
+    </section>

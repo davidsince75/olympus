@@ -91,9 +91,35 @@ for (const f of SURFACES) {
           E.field.contours.map((c) => `${c.level > 0 ? '+' : ''}${c.level}: ${c.lines.length}`).join(', '));
     }
   }
-  const retired = ['Ines Halvorsen', 'Uncertainty is drawn, not hidden', 'last 18 h', 'the engine is visible'];
+  const retired = ['Ines Halvorsen', 'Uncertainty is drawn, not hidden', 'last 18 h', 'the engine is visible',
+                   // 24 Sep 2026, the Deck log: the 4.12 vs 3.6 gap is partly the deck's own method, and the
+                   // monthly files carry no uncertainty
+                   'the Arctic gap is 4.12 against about 3.6', 'with per-cell uncertainty in the source files',
+                   // a running mean clipped at the ends of the record still carries the season
+                   'Math.max(0,i-6), b=Math.min(m-1,i+5)'];
   const found = retired.filter((t) => s.includes(t));
   rec('deck carries none of the retired claims', found.length === 0, found.join(', '));
+  // the Deck log (24 Sep 2026): its payload parses, the reference index is OSI SAF's own and in
+  // km2, the checks it quotes are dated, and the licence credit the sea-ice records require is shown
+  {
+    const i = s.indexOf('\nconst DECKLOG = ');
+    let K = null;
+    if (i >= 0) { const a = i + 17, j = s.indexOf('\n', a); try { K = JSON.parse(s.slice(a, j).replace(/;\s*$/, '')); } catch (e) { K = null; } }
+    rec('deck carries the log and its payload', !!K && /id="dlog"/.test(s) && /id="logBtn"/.test(s),
+        K ? `built ${K.build.built}` : 'no DECKLOG');
+    if (K) {
+      const H = K.sii && K.sii.hemi;
+      rec('the log\'s reference extent is OSI SAF\'s index, integer km2, one value per month',
+          !!H && ['nh', 'sh'].every((h) => H[h].v.every((v) => v === null || Number.isInteger(v))
+            && H[h].v.length === (+H[h].mN.slice(0, 4) * 12 + +H[h].mN.slice(4)) - (+H[h].m0.slice(0, 4) * 12 + +H[h].m0.slice(4)) + 1),
+          H ? `nh ${H.nh.m0}-${H.nh.mN}, created ${H.nh.created}` : '');
+      const C = K.checks || {};
+      const age = (Date.now() - Date.parse(C.checked_utc)) / 864e5;
+      rec('the source checks the log quotes are dated and under 45 days old', age < 45,
+          `checked ${C.checked_utc}, ${age.toFixed(0)} d ago — run ingest/check_sources.py`);
+    }
+    rec('the sea-ice licence credit is shown', />Copyright EUMETSAT</.test(s));
+  }
 }
 
 // ---------------------------------------------------------------- probes
@@ -118,6 +144,7 @@ run('every layer switch changes the picture', ['scripts/probe_layers.cjs', 'dist
   return { ok, detail: (inert.length ? `inert on the Antarctic disc: ${inert.join(', ')}` : `${Object.keys(S.layers).length - 2} draw on the Antarctic disc`)
                      + (ensoInk !== undefined ? `; El Niño contours on the globe: ${ensoInk} px` : '') };
 });
+run('the Deck log says what the record says', ['scripts/probe_decklog.cjs', 'dist/deck.html'], tally(/(\d+) passed, (\d+) failed/));
 run('disc and globe zoom', ['scripts/probe_zoom.cjs', 'dist/deck.html'], (o) => ({ ok: /"errors": \[\]/.test(o) && /"pct_G_reset": "100%"/.test(o) }));
 
 // ---------------------------------------------------------------- phones

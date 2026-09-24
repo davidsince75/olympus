@@ -175,8 +175,9 @@ h1 em{{color:var(--ice)}}
     <a class="door" href="stations.html"><b>The Stations</b><span>166 polar stations, camps and runways, who runs them, and whether you can see any of what they measure.</span></a>
     <a class="door" href="named-ice.html"><b>The Named Ice</b><span>Fifty-nine Inuktitut words for one substance, and the pictures and films that made the poles in our heads.</span></a>
   </div>
-  <div class="prov">Extent: EUMETSAT OSI SAF sea-ice concentration, integrated on the 25 km EASE2 grid at the 15 % threshold,
-  computed at build time from the same arrays the Deck draws. Baseline: the 1991–2020 mean of the same calendar month.
+  <div class="prov">Extent: EUMETSAT OSI SAF sea-ice concentration (Copyright EUMETSAT), cells at or above 15 % in the month’s
+  mean concentration field on the 25 km EASE2 grid, computed at build time from the same arrays the Deck draws. OSI SAF’s own
+  published extent averages the daily extents and runs lower; the Deck log shows both. Baseline: the 1991–2020 mean of the same calendar month.
   Living layers (aurora, Kp, ice drift, radar footprints) {('rebuilt ' + live_built) if live_built else 'as of their stated observation times'}.
   Nothing on this page is typed by hand.</div>
 </main>"""

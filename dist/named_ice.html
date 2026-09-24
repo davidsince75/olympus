@@ -1,7 +1,8 @@
 <title>The Named Ice</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap"></noscript>
 <style>
 /* Olympus — shared design tokens
    One palette across every surface. The deck established it; the Atlas and the
@@ -536,11 +537,20 @@ const md = t => t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/\*(.+?)\*/
     {col:[ 95,227,192], amp:.095, freq:0.9, sp:-.019, drift:-.006, y:.63, h:.33, a:.14}
   ];
   const FLAKES = [];
+  /* The curtains are drawn at 1/DS resolution with no filter, blurred once,
+     and scaled up. Same softness; the old path ran ~1,200 separately
+     blur-filtered fills a frame, which on the audit host (24 Sep 2026) was one
+     23-second task per frame at 1440 px. */
+  const DS = 6;
+  const cA = document.createElement("canvas"), gA = cA.getContext("2d");
+  const cB = document.createElement("canvas"), gB = cB.getContext("2d");
   function size(){
     const dpr = Math.min(devicePixelRatio||1, 2);
     W = cv.clientWidth; H = cv.clientHeight;
     cv.width = Math.round(W*dpr); cv.height = Math.round(H*dpr);
     g.setTransform(dpr,0,0,dpr,0,0);
+    cA.width = cB.width = Math.max(2, Math.ceil(W/DS));
+    cA.height = cB.height = Math.max(2, Math.ceil(H/DS));
     FLAKES.length = 0;
     const n = Math.round(Math.min(150, W*H/14000));
     for(let i=0;i<n;i++) FLAKES.push({
@@ -563,9 +573,9 @@ const md = t => t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/\*(.+?)\*/
     g.globalAlpha=1;
   }
   function curtain(b, t){
-    const step = Math.max(3, W/300);
+    const g = gA, W = cA.width, H = cA.height;
+    const step = Math.max(1, W/300);
     g.globalCompositeOperation = "lighter";
-    g.filter = "blur(" + Math.max(9, W/120).toFixed(0) + "px)";
     const yOff = Math.sin(t*b.drift)*0.035;
     for(let x=0; x<=W; x+=step){
       const u = x/W;
@@ -583,7 +593,6 @@ const md = t => t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/\*(.+?)\*/
       g.fillStyle = grd;
       g.fillRect(x-step, yc-hh, step*3, hh*1.55);
     }
-    g.filter = "none";
     g.globalCompositeOperation = "source-over";
   }
   function snow(t, dt){
@@ -606,7 +615,16 @@ const md = t => t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/\*(.+?)\*/
     g.clearRect(0,0,W,H);
     g.fillStyle="#070910"; g.fillRect(0,0,W,H);
     stars();
+    gA.clearRect(0,0,cA.width,cA.height);
     for(const b of BANDS) curtain(b, t);
+    gB.clearRect(0,0,cB.width,cB.height);
+    gB.filter = "blur(" + Math.max(1.5, W/120/DS).toFixed(1) + "px)";
+    gB.drawImage(cA,0,0);
+    gB.filter = "none";
+    g.globalCompositeOperation = "lighter";
+    g.imageSmoothingEnabled = true; g.imageSmoothingQuality = "high";
+    g.drawImage(cB,0,0,W,H);
+    g.globalCompositeOperation = "source-over";
     snow(t, dt);
     const hz = g.createLinearGradient(0,H*.72,0,H);
     hz.addColorStop(0,"rgba(10,12,17,0)"); hz.addColorStop(1,"rgba(10,12,17,.9)");

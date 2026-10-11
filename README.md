@@ -41,6 +41,7 @@ survives. Recent ones, in the order they were applied:
     build/patch_skin_lab.py      11 Oct     two skins, Ops and Lab, switched in the header (#ops / #lab)
     build/patch_header_stack.py  11 Oct     header controls as one block of six equal cells
     build/patch_skin_atlas.py    11 Oct     the same skins and header block on the Station Network
+    build/patch_atlas_fontload.py 11 Oct    the Station Network's web fonts switch on (escaped onload quotes)
 
 `scripts/probe_skin.py ORIG NEW_OPS NEW_LAB OUTDIR` checks the skins with a virtual clock: Ops must
 draw the same pixels as the unskinned deck on the map, timeline and El Niño canvases in all four

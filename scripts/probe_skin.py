@@ -103,4 +103,5 @@ async def main():
     print("\nALL ASSERTIONS PASS" if ok else "\nASSERTION FAILED")
     sys.exit(0 if ok else 1)
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())

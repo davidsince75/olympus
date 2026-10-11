@@ -1,4 +1,5 @@
 <title>Olympus Deck</title>
+<script>(function(){var d="ops",k=null,h=(location.hash||"").slice(1);if(h==="lab"||h==="ops")k=h;else{try{var v=localStorage.getItem("olympus.skin");if(v==="lab"||v==="ops")k=v;}catch(e){}}document.documentElement.setAttribute("data-skin",k||d);})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Saira+Condensed:wght@500;600;700&display=swap" media="print" onload="this.media='all'">
@@ -401,28 +402,176 @@ table.dlt td .off{color:var(--ink4)}
 
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
+<style id="skin-lab">
+/* ---------- skins ----------
+   The switch is always shown; Ops is the deck as it was written. Lab is the
+   instrument/lab look: cool white-grey panels on hairlines, the planet on a
+   pale light-table field, sentence-case headings, readouts still in Plex Mono.
+   Everything below the switch rules applies to Lab only. */
+:root{ --field:#04070B; --field-hi:#04070B; --plate:transparent; --sea:transparent }
+.skin{display:flex;align-self:center;margin:0 10px 0 0;border:1px solid var(--line2);border-radius:2px;overflow:hidden;background:rgba(6,9,14,.6);flex:0 0 auto}
+.skin button{font-family:var(--mono);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;padding:5px 10px;color:var(--ink3)}
+.skin button+button{border-left:1px solid var(--line2)}
+.skin button:hover{color:var(--ice)}
+.skin button[aria-pressed="true"]{color:var(--ice);background:rgba(15,165,190,.16)}
+.sg-lab{display:none}
+@media (max-width:720px){ .skin{margin:6px 0 6px 8px} .hdr .skin+.xnav{margin-left:8px} }
+
+/* Lab tokens: the same names, so every component follows without being restyled.
+   Ink steps measured on white: 16.5, 9.5, 6.3, 4.6 : 1. */
+:root[data-skin="lab"]{
+  --void:#EDF1F4; --panel:#FFFFFF; --panel2:#F3F6F8; --panel3:#E6ECF1;
+  --line:#DAE1E7; --line2:#C5CFD8;
+  --ink:#13202B; --ink2:#384756; --ink3:#54626F; --ink4:#66737F;
+  --ice:#0B6E96;
+  --s1:#1388AE; --s2:#A85A17; --s3:#6E4BC0; --s4:#2D7A4A;
+  --good:#2D7A4A; --warn:#A85A17; --crit:#BB3B33;
+  --disp:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --field:#E3E9EE; --field-hi:#F7F9FA; --plate:rgba(255,255,255,.86); --sea:#0B1620;
+  color-scheme:light;
+}
+/* html too: the public site wraps the deck in a page that paints html dark */
+html[data-skin="lab"],html[data-skin="lab"] body{background:var(--void)}
+
+/* header */
+html[data-skin="lab"] .sg-ops{display:none}
+html[data-skin="lab"] .sg-lab{display:block}
+html[data-skin="lab"] .brand h1{font-size:16px;font-weight:600;letter-spacing:.005em;text-transform:none}
+html[data-skin="lab"] .brand .sub{font-size:10.5px;letter-spacing:.03em;text-transform:none;margin-top:4px}
+html[data-skin="lab"] .hdr .hctl a,html[data-skin="lab"] .hdr .hctl button{letter-spacing:.07em}
+html[data-skin="lab"] .hdr .hctl a:hover,html[data-skin="lab"] .hdr .hctl button:hover{background-image:linear-gradient(rgba(11,110,150,.06),rgba(11,110,150,.06))}
+html[data-skin="lab"] .hdr .hctl a[aria-current=page],html[data-skin="lab"] .hdr .hctl button[aria-pressed="true"]{background-image:linear-gradient(rgba(11,110,150,.10),rgba(11,110,150,.10))}
+html[data-skin="lab"] .feed .nm{font-size:10.5px;font-weight:500;letter-spacing:.05em}
+html[data-skin="lab"] .dot.stale{background:#A9B4BE}
+
+/* headings in sentence case; micro-labels keep capitals with modest tracking */
+html[data-skin="lab"] .ph h2{font-size:12.5px;letter-spacing:.005em;text-transform:none}
+html[data-skin="lab"] .note h3,html[data-skin="lab"] .dlog h3{font-size:12px;letter-spacing:.005em;text-transform:none;color:var(--ink)}
+html[data-skin="lab"] .dlog-hd h2{font-size:14px;letter-spacing:.005em;text-transform:none}
+html[data-skin="lab"] .pairrow .lab,html[data-skin="lab"] .hero .lab,html[data-skin="lab"] .grow .k,
+html[data-skin="lab"] .feat .fk,html[data-skin="lab"] .feat .nums .lab,html[data-skin="lab"] .tp .dt,
+html[data-skin="lab"] .legend .cap,html[data-skin="lab"] .exidx .grp,html[data-skin="lab"] .dlog-meta dt,
+html[data-skin="lab"] table.dlt th,html[data-skin="lab"] table.dlt tr.grp td,html[data-skin="lab"] .dlog-ym small,
+html[data-skin="lab"] .clock .l{letter-spacing:.07em;font-weight:500}
+html[data-skin="lab"] .stn .nm{font-size:12.5px;font-weight:500;letter-spacing:.005em;text-transform:none}
+html[data-skin="lab"] .evt .ttl{font-size:12.5px;font-weight:600;letter-spacing:.005em;text-transform:none}
+html[data-skin="lab"] .dsp-top .who{font-size:13.5px;font-weight:600;letter-spacing:.005em;text-transform:none}
+html[data-skin="lab"] .exh b{font-weight:600;letter-spacing:.005em}
+html[data-skin="lab"] .pairrow .v{font-family:var(--mono);font-size:26px;font-weight:400;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+
+/* provenance tags: same four modes, inks that read on white */
+html[data-skin="lab"] .tag,html[data-skin="lab"] .exk{letter-spacing:.06em;font-weight:600}
+html[data-skin="lab"] .tag.live,html[data-skin="lab"] .k-mech,html[data-skin="lab"] .dlog-check .r.ok{background:rgba(45,122,74,.12);color:#21673E}
+html[data-skin="lab"] .tag.sim,html[data-skin="lab"] .k-ins{background:rgba(110,75,192,.11);color:#5A3CA8}
+html[data-skin="lab"] .tag.arch,html[data-skin="lab"] .k-obj{background:rgba(11,110,150,.10);color:#0A6584}
+html[data-skin="lab"] .tag.ft,html[data-skin="lab"] .k-num,html[data-skin="lab"] .dlog-check .r.diff{background:rgba(168,90,23,.12);color:#8F4C12}
+html[data-skin="lab"] .tag.wait,html[data-skin="lab"] .dlog-check .r.note{background:rgba(84,98,111,.12);color:#54626F}
+html[data-skin="lab"] .tag.ref{background:rgba(19,32,43,.06);color:var(--ink2)}
+html[data-skin="lab"] .tag.nil{background:rgba(84,98,111,.10);color:var(--ink3)}
+
+/* controls: sentence case, filled selection, softer corners */
+html[data-skin="lab"] .modebar{border-radius:4px;background:var(--line2);border-color:var(--line2)}
+html[data-skin="lab"] .modebar button,html[data-skin="lab"] .hemi button{font-size:11px;font-weight:500;letter-spacing:.01em;text-transform:none;padding:4px 11px;background:var(--panel)}
+html[data-skin="lab"] .modebar button[aria-pressed="true"],html[data-skin="lab"] .hemi button[aria-pressed="true"]{background:var(--ice);color:#fff}
+html[data-skin="lab"] .gctl button{border-radius:4px;background:var(--panel)}
+/* HUD buttons can sit over the dark planet, so a pressed tint goes on an opaque panel, never on what is behind */
+html[data-skin="lab"] .gctl button[aria-pressed="true"]{background:linear-gradient(rgba(11,110,150,.12),rgba(11,110,150,.12)),var(--panel);color:var(--ice);border-color:var(--ice)}
+html[data-skin="lab"] .feat .acts button,html[data-skin="lab"] .dsp .acts button,html[data-skin="lab"] .dlog-acts button,html[data-skin="lab"] .dlog-tabs button{font-size:11.5px;font-weight:500;letter-spacing:.01em;text-transform:none}
+html[data-skin="lab"] .feat .acts button,html[data-skin="lab"] .dsp .acts button,html[data-skin="lab"] .dlog-acts button,
+html[data-skin="lab"] .tbtn,html[data-skin="lab"] .tp .spd,html[data-skin="lab"] .dlog-step button,html[data-skin="lab"] .dlog-x,
+html[data-skin="lab"] .dlog-tabs,html[data-skin="lab"] .dlog-sers button,html[data-skin="lab"] .hemi,html[data-skin="lab"] .legend,
+html[data-skin="lab"] .mapkey,html[data-skin="lab"] .prov,html[data-skin="lab"] .tt,html[data-skin="lab"] .exbox,html[data-skin="lab"] .avatar{border-radius:4px}
+html[data-skin="lab"] .dsp .acts button.pri,html[data-skin="lab"] .dlog-acts button.pri{background:var(--ice);border-color:var(--ice);color:#fff}
+html[data-skin="lab"] .lay.on .sw,html[data-skin="lab"] .learn[aria-pressed="true"] .sw{background:var(--ice);border-color:var(--ice)}
+html[data-skin="lab"] .lay.on .sw::after,html[data-skin="lab"] .learn[aria-pressed="true"] .sw::after{background:#fff}
+html[data-skin="lab"] .meter .fill{background:linear-gradient(90deg,#0B6E96,#1388AE)}
+
+/* lists and tables */
+html[data-skin="lab"] .stn,html[data-skin="lab"] .evt,html[data-skin="lab"] table.dlt td{border-bottom-color:var(--line)}
+html[data-skin="lab"] table.dlt tr.grp td{background:var(--panel2)}
+html[data-skin="lab"] table.dlt tr.cur td{background:rgba(11,110,150,.07)}
+
+/* the featured event */
+html[data-skin="lab"] .feat{background:linear-gradient(180deg,rgba(168,74,26,.06),rgba(168,74,26,0) 70%)}
+html[data-skin="lab"] .feat h3{font-size:24px;font-weight:600;letter-spacing:-.005em;text-transform:none;color:#A2481B}
+html[data-skin="lab"] .feat .fk .tag{background:rgba(168,74,26,.11);color:#8F3F15}
+html[data-skin="lab"] .feat .out{border-left-color:rgba(168,74,26,.5)}
+
+/* floating furniture */
+html[data-skin="lab"] .exbox{background:rgba(255,255,255,.98);box-shadow:0 8px 28px rgba(19,32,43,.16)}
+html[data-skin="lab"] .tt{background:var(--panel);box-shadow:0 4px 14px rgba(19,32,43,.14)}
+
+/* the map: the planet on a pale light table, ruled at 24 px. The HUD sits on
+   the field in one place and on the dark planet in another, so in Lab its text
+   rides on light plates that read on both. */
+html[data-skin="lab"] .mapwrap{background:
+  radial-gradient(rgba(19,32,43,.075) 1px,transparent 1.3px) 12px 12px/24px 24px,
+  radial-gradient(ellipse at 50% 46%,var(--field-hi) 0,var(--field) 78%)}
+html[data-skin="lab"] .hud .readout:not(:empty),html[data-skin="lab"] .hud .gctl>span:not(:empty),
+html[data-skin="lab"] .hud .scale{background:var(--plate);padding:1px 5px;border-radius:3px}
+html[data-skin="lab"] .hud .prov{background:var(--panel)}
+html[data-skin="lab"] .legend,html[data-skin="lab"] .mapkey{background:var(--plate);border-color:var(--line)}
+/* the current-colour legend uses the ramp's own colours, which are made for the
+   dark sea they are drawn on; each sits on a chip of that sea so it reads as drawn */
+html[data-skin="lab"] #flowNote span{background:var(--sea);padding:0 4px;border-radius:2px}
+</style>
+<style id="hdr-stack">
+/* ---------- header controls: one block, six equal cells ----------
+   Row 1 is where you are (the surfaces), row 2 is what you do here (log, skin).
+   The cells are header furniture like the brand and the clock: full height,
+   flush, separated by the same 1 px hairlines as everything else. */
+.hdr .hctl{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,minmax(24px,1fr));
+  gap:1px;background:var(--line);border-right:1px solid var(--line);flex:0 0 auto;align-self:stretch}
+.hdr .hctl .xnav,.hdr .hctl .skin{display:grid;grid-template-columns:subgrid;gap:1px;margin:0;border:0;border-radius:0;
+  background:none;overflow:visible;align-self:stretch}
+.hdr .hctl .xnav{grid-column:1/-1;grid-row:1}
+.hdr .hctl .logbtn{grid-column:1;grid-row:2}
+.hdr .hctl .skin{grid-column:2/-1;grid-row:2}
+.hdr .hctl .xnav a,.hdr .hctl .logbtn,.hdr .hctl .skin button{display:flex;align-items:center;justify-content:center;gap:6px;
+  margin:0;padding:0 14px;border:0;border-radius:0;align-self:stretch;
+  background-color:var(--panel);background-image:none;
+  font-family:var(--mono);font-size:9.5px;font-weight:400;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--ink3);white-space:nowrap;text-decoration:none}
+.hdr .hctl .logbtn{color:var(--ink2)}
+.hdr .hctl a:hover,.hdr .hctl button:hover{color:var(--ice);background-image:linear-gradient(rgba(15,165,190,.10),rgba(15,165,190,.10))}
+.hdr .hctl a[aria-current=page],.hdr .hctl button[aria-pressed="true"]{color:var(--ice);background-image:linear-gradient(rgba(15,165,190,.16),rgba(15,165,190,.16))}
+.hdr .hctl a:focus-visible,.hdr .hctl button:focus-visible{outline-offset:-2px}
+@media (max-width:720px){
+  .hdr .hctl{flex:1 1 100%;order:3;border-right:0;border-top:1px solid var(--line);grid-template-rows:repeat(2,32px)}
+  .hdr .hctl .xnav a,.hdr .hctl .logbtn,.hdr .hctl .skin button{padding:0 8px;letter-spacing:.08em}
+}
+</style>
 
 <div class="shell">
   <header class="hdr">
     <div class="brand">
-      <svg class="sigil" viewBox="0 0 24 24" aria-hidden="true" fill="none">
+      <svg class="sigil sg-ops" viewBox="0 0 24 24" aria-hidden="true" fill="none">
         <circle cx="12" cy="12" r="10" stroke="#1D2A38" stroke-width="1"/>
         <circle cx="12" cy="12" r="6.4" stroke="#1D2A38" stroke-width="1"/>
         <circle cx="12" cy="12" r="2.8" stroke="#0FA5BE" stroke-width="1"/>
         <path d="M12 2v20M2 12h20" stroke="#1D2A38" stroke-width="1"/>
         <circle cx="12" cy="12" r="1.5" fill="#7FE3F5"/>
       </svg>
+      <svg class="sigil sg-lab" viewBox="0 0 24 24" aria-hidden="true" fill="none" style="color:var(--ink)">
+        <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.15"/>
+        <ellipse cx="12" cy="12" rx="4" ry="9.5" stroke="currentColor" stroke-width=".85"/>
+        <path d="M3.3 8.2h17.4M3.3 15.8h17.4" stroke="currentColor" stroke-width=".85"/>
+        <path d="M2.5 12h19" stroke="var(--ice)" stroke-width="1.25"/>
+      </svg>
       <div>
         <h1>Olympus</h1>
         <div class="sub">Cryosphere Deck</div>
       </div>
     </div>
-    <button type="button" class="logbtn" id="logBtn" aria-pressed="false" aria-controls="dlog" data-ex="deck_log" title="Deck log (L)"><svg class="glyph" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 1.5h8M1 4h8M1 6.5h8M1 9h5" stroke="currentColor" stroke-width="1.1" fill="none"/></svg>Log</button>
-    <nav class="xnav" aria-label="Olympus surfaces" data-ex="surfaces">
+    <div class="hctl">
+        <nav class="xnav" aria-label="Olympus surfaces" data-ex="surfaces">
   <a href="https://claude.ai/code/artifact/fd6023e1-89a7-42a4-aec2-072c8f286c5f"    data-s="deck" aria-current="page">Deck</a>
   <a href="https://claude.ai/code/artifact/a5b3f808-d2de-4e3e-9bc5-c3d7a684c4a4"   data-s="atlas">Stations</a>
   <a href="https://claude.ai/code/artifact/f24d74f7-e536-4906-9bf5-3b2bc90d71a3" data-s="culture">Named Ice</a>
 </nav>
+    <button type="button" class="logbtn" id="logBtn" aria-pressed="false" aria-controls="dlog" data-ex="deck_log" title="Deck log (L)"><svg class="glyph" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 1.5h8M1 4h8M1 6.5h8M1 9h5" stroke="currentColor" stroke-width="1.1" fill="none"/></svg>Log</button>
+    <div class="skin" role="group" aria-label="Interface skin"><button type="button" data-k="ops" aria-pressed="true" title="Ops skin (#ops)">Ops</button><button type="button" data-k="lab" aria-pressed="false" title="Lab skin (#lab)">Lab</button></div>
+    </div>
 
       <div class="feeds" id="feeds"></div>
     <div class="clock" data-ex="age_stamp">
@@ -651,6 +800,74 @@ const LIVE_FETCH = false;
 (function(){
 "use strict";
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+
+/* ---------------- skins ----------------
+   Two looks over one deck. Only what is drawn OFF the planet differs between
+   them; the planet and every layer on it are drawn identically in both, so no
+   offscreen cache depends on the skin. SKIN.ops holds the literals this deck
+   was written with, moved here unchanged by build/patch_skin_lab.py. */
+const SKIN={
+  ops:{pair:"rgba(147,167,186,.85)",
+    tlGrid:"rgba(29,42,56,.9)",
+    tlAxis:"#3E4E5E",
+    tlRun:"rgba(155,118,220,.5)",
+    tlTone:{sh:["rgba(15,165,190,.42)","#7FE3F5"], nh:["rgba(200,128,47,.40)","#E8B77E"]},
+    tlAnchor:"#C8802F",
+    tlKey:"#5F7286",
+    tlCur:"#7FE3F5",
+    fcZero:"rgba(147,167,186,.45)",
+    fcRef:"rgba(242,198,164,.65)",
+    fcRefTx:"rgba(242,198,164,.8)",
+    fcDot:"#F2C6A4",
+    fcVal:"rgba(221,232,241,.85)", halo:null},
+  lab:{pair:"#54626F",
+    tlGrid:"#E3E8ED",
+    tlAxis:"#6B7885",
+    tlRun:"rgba(110,75,192,.55)",
+    tlTone:{sh:["rgba(15,165,190,.6)","#0B6E96"], nh:["rgba(200,128,47,.55)","#A85A17"]},
+    tlAnchor:"#A85A17",
+    tlKey:"#54626F",
+    tlCur:"#0B6E96",
+    fcZero:"rgba(56,71,86,.35)",
+    fcRef:"rgba(162,72,27,.6)",
+    fcRefTx:"#A2481B",
+    fcDot:"#A2481B",
+    fcVal:"#13202B",
+    halo:"rgba(16,34,52,.30)"}
+};
+const skinNow=()=>SKIN[document.documentElement.getAttribute("data-skin")] ? document.documentElement.getAttribute("data-skin") : "ops";
+let TH=SKIN[skinNow()];
+function setSkin(k,save){
+  if(!SKIN[k]) return;
+  document.documentElement.setAttribute("data-skin",k);
+  TH=SKIN[k];
+  $$(".skin button").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.k===k)));
+  if(save){ try{ localStorage.setItem("olympus.skin",k); }catch(e){} }
+  try{ featChart(); }catch(e){}
+  try{ drawTL(); }catch(e){}
+}
+/* Lab sets the planet on a pale field, where a soft shadow gives it weight. A
+   blurred circle is costly to rasterise, so it is drawn once into a sprite and
+   composited; the key is the radius in 4 px steps, so a zoom re-renders it at
+   most every few pixels. Past 900 px the disc runs off the panel and the shadow
+   could not be seen, so it is skipped rather than allocated. */
+const HALO={cv:null,key:""};
+function skinHalo(g,cx,cy,s){
+  if(!TH.halo || !(s>8) || s>900) return;
+  const dpr=Math.min(2,window.devicePixelRatio||1), R=Math.max(8,Math.round(s/4)*4);
+  const pad=Math.ceil(R*0.16)+4, W=(R+pad)*2, key=R+"|"+dpr+"|"+TH.halo;
+  if(HALO.key!==key){
+    const c=HALO.cv||(HALO.cv=document.createElement("canvas"));
+    c.width=Math.round(W*dpr); c.height=Math.round(W*dpr);
+    const x=c.getContext("2d"); x.setTransform(dpr,0,0,dpr,0,0); x.clearRect(0,0,W,W);
+    x.shadowColor=TH.halo; x.shadowBlur=R*0.07*dpr; x.shadowOffsetY=R*0.022*dpr;
+    x.fillStyle="#0A1722"; x.beginPath(); x.arc(W/2,W/2,R,0,7); x.fill();
+    HALO.key=key;
+  }
+  const k=s/R, Wd=W*k;
+  g.drawImage(HALO.cv, cx-Wd/2, cy-Wd/2, Wd, Wd);
+}
+
 const RE=6371.0088;
 const D=Math.PI/180;
 
@@ -989,6 +1206,7 @@ function pathRings(ctx,rings,cx,cy,s,breakCenter){
 /* ---------------- one polar disc ---------------- */
 function drawDisc(g,cx,cy,s,S,compact){
   const h=S?"sh":"nh";
+  skinHalo(g,cx,cy,s);
   g.save(); g.beginPath(); g.arc(cx,cy,s,0,7); g.clip();
   const og=g.createRadialGradient(cx,cy,0,cx,cy,s);
   og.addColorStop(0,"#08131C"); og.addColorStop(.72,"#061019"); og.addColorStop(1,"#040A11");
@@ -1988,14 +2206,14 @@ function featChart(){
   const path=()=>{ g.beginPath(); g.moveTo(X(0),y0); for(let i=0;i<n;i++) g.lineTo(X(i),Y(v[i])); g.lineTo(X(n-1),y0); g.closePath(); };
   g.save(); g.beginPath(); g.rect(0,0,w,y0); g.clip(); path(); g.fillStyle="rgba(236,132,72,.62)"; g.fill(); g.restore();
   g.save(); g.beginPath(); g.rect(0,y0,w,h-y0); g.clip(); path(); g.fillStyle="rgba(92,164,224,.52)"; g.fill(); g.restore();
-  g.strokeStyle="rgba(147,167,186,.45)"; g.lineWidth=1; g.beginPath(); g.moveTo(0,y0); g.lineTo(w,y0); g.stroke();
-  g.setLineDash([3,3]); g.strokeStyle="rgba(242,198,164,.65)"; g.beginPath(); g.moveTo(0,Y(2.5)); g.lineTo(w,Y(2.5)); g.stroke(); g.setLineDash([]);
+  g.strokeStyle=TH.fcZero; g.lineWidth=1; g.beginPath(); g.moveTo(0,y0); g.lineTo(w,y0); g.stroke();
+  g.setLineDash([3,3]); g.strokeStyle=TH.fcRef; g.beginPath(); g.moveTo(0,Y(2.5)); g.lineTo(w,Y(2.5)); g.stroke(); g.setLineDash([]);
   g.font="9px 'IBM Plex Mono', monospace"; g.textBaseline="bottom";
-  g.fillStyle="rgba(242,198,164,.8)"; g.textAlign="left"; g.fillText("+2.5 °C", 3, Y(2.5)-1);
+  g.fillStyle=TH.fcRefTx; g.textAlign="left"; g.fillText("+2.5 °C", 3, Y(2.5)-1);
   const ip=v.indexOf(E.roni.peak.value), il=n-1;
   for(const [i,lab,al] of [[ip, esgn(v[ip],2), "center"], [il, esgn(v[il],2), "right"]]){
-    g.fillStyle="#F2C6A4"; g.beginPath(); g.arc(X(i),Y(v[i]),2.4,0,7); g.fill();
-    g.fillStyle="rgba(221,232,241,.85)"; g.textAlign=al; g.fillText(lab, al==="right"?X(i)-4:X(i), Y(v[i])-3);
+    g.fillStyle=TH.fcDot; g.beginPath(); g.arc(X(i),Y(v[i]),2.4,0,7); g.fill();
+    g.fillStyle=TH.fcVal; g.textAlign=al; g.fillText(lab, al==="right"?X(i)-4:X(i), Y(v[i])-3);
   }
 }
 
@@ -2365,6 +2583,7 @@ function drawGlobe(g,cx,cy,s0,w,h){
   const speed=amocSpeed();
   const phase=(performance.now()/1000*0.16*speed);
 
+  skinHalo(g,cx,cy,s);
   g.save(); g.beginPath(); g.arc(cx,cy,s,0,7); g.clip();
   const og=g.createRadialGradient(cx-s*0.25,cy-s*0.3,s*0.1,cx,cy,s*1.05);
   og.addColorStop(0,"#0A1722"); og.addColorStop(.7,"#071119"); og.addColorStop(1,"#03080D");
@@ -2528,7 +2747,7 @@ function drawMap(){
     drawDisc(g,c1,cy,s,true,true);
     drawDisc(g,c2,cy,s,false,true);
     g.font="600 10px 'Saira Condensed', sans-serif"; g.textAlign="center";
-    g.fillStyle="rgba(147,167,186,.85)"; g.letterSpacing="2px";
+    g.fillStyle=TH.pair; g.letterSpacing="2px";
     g.fillText("ANTARCTIC",c1,cy-s-10); g.fillText("ARCTIC",c2,cy-s-10);
     g.letterSpacing="0px";
     st.cx=c1; st.cy=cy; st.s=s;
@@ -2916,8 +3135,8 @@ function drawTL(){
   const pad=(hi-lo)*0.08; lo-=pad; hi+=pad;
   const Xo=o=>L+(o/SPAN)*iw, X=i=>Xo(YMO[i]), Y=v=>T+ih-((v-lo)/(hi-lo))*ih;
 
-  g.strokeStyle="rgba(29,42,56,.9)"; g.lineWidth=1;
-  g.font="9px 'IBM Plex Mono', monospace"; g.fillStyle="#3E4E5E"; g.textAlign="right";
+  g.strokeStyle=TH.tlGrid; g.lineWidth=1;
+  g.font="9px 'IBM Plex Mono', monospace"; g.fillStyle=TH.tlAxis; g.textAlign="right";
   for(let i=0;i<=4;i++){
     const v=lo+(hi-lo)*i/4, y=Math.round(Y(v))+0.5;
     g.beginPath(); g.moveTo(L,y); g.lineTo(w-Rr,y); g.stroke();
@@ -2932,11 +3151,11 @@ function drawTL(){
   H.runs.forEach((r,ri)=>{
     if(!ri) return;
     const x=Math.round(X(r[0]))+0.5;
-    g.strokeStyle="rgba(155,118,220,.5)"; g.setLineDash([2,3]); g.lineWidth=1;
+    g.strokeStyle=TH.tlRun; g.setLineDash([2,3]); g.lineWidth=1;
     g.beginPath(); g.moveTo(x,T); g.lineTo(x,T+ih); g.stroke(); g.setLineDash([]);
   });
 
-  const TONE={sh:["rgba(15,165,190,.42)","#7FE3F5"], nh:["rgba(200,128,47,.40)","#E8B77E"]};
+  const TONE=TH.tlTone;
   for(const hh of hs){
     const E=OSI.hemi[hh].ext, O=OSI.hemi[hh].ymo, m=E.length;
     const Xh=i=>Xo(O[i]);
@@ -2958,16 +3177,16 @@ function drawTL(){
     (ANCHORS[hh]||[]).forEach(a=>{
       const o=(+a.ym.slice(0,4)*12 + (+a.ym.slice(4)-1)) - YM0;
       if(o<0||o>SPAN) return;
-      g.strokeStyle="#C8802F"; g.lineWidth=1.3;
+      g.strokeStyle=TH.tlAnchor; g.lineWidth=1.3;
       g.beginPath(); g.arc(Xo(o),Y(a.v),4.2,0,7); g.stroke();
     });
   }
-  g.fillStyle="#5F7286"; g.textAlign="right"; g.font="9px 'IBM Plex Mono', monospace";
+  g.fillStyle=TH.tlKey; g.textAlign="right"; g.font="9px 'IBM Plex Mono', monospace";
   g.fillText(hs.length>1?"southern cyan · northern amber · 12-month running mean":"12-month running mean", w-Rr-3, T+11);
 
   const px=X(monIdx());
-  g.strokeStyle="#7FE3F5"; g.lineWidth=1; g.beginPath(); g.moveTo(px,T-3); g.lineTo(px,T+ih+3); g.stroke();
-  g.fillStyle="#7FE3F5"; g.beginPath(); g.moveTo(px,T-3); g.lineTo(px-4,T-9); g.lineTo(px+4,T-9); g.closePath(); g.fill();
+  g.strokeStyle=TH.tlCur; g.lineWidth=1; g.beginPath(); g.moveTo(px,T-3); g.lineTo(px,T+ih+3); g.stroke();
+  g.fillStyle=TH.tlCur; g.beginPath(); g.moveTo(px,T-3); g.lineTo(px-4,T-9); g.lineTo(px+4,T-9); g.closePath(); g.fill();
   st._tl={L,Rr,T,B,iw,ih,X,Xo,Y,n,lo,hi,SPAN};
 }
 
@@ -4682,6 +4901,12 @@ ocLoad();
 flowNote();
 CAM.idle=performance.now();
 new ResizeObserver(()=>{ drawTL(); }).observe(tl);
+$$(".skin button").forEach(b=>{
+  b.setAttribute("aria-pressed", String(b.dataset.k===skinNow()));
+  b.addEventListener("click",()=>setSkin(b.dataset.k,true));
+});
+window.addEventListener("hashchange",()=>{ const h=(location.hash||"").slice(1); if(SKIN[h]) setSkin(h,false); });
+
 (function(){ let t=0; new ResizeObserver(()=>{ clearTimeout(t); t=setTimeout(()=>{ if(OC.ready&&Math.abs(ocCount()-OC.nPart)>320) ocSeed(); },320); }).observe(map); })();
 requestAnimationFrame(frame);
 })();

@@ -38,6 +38,12 @@ survives. Recent ones, in the order they were applied:
     build/patch_feature_enso.py  24 Sep     opens on the globe over the Pacific; El Niño featured
     build/patch_decklog.py       24 Sep     the Deck log: the record as tables, CSV, sources, checks
     build/patch_running_mean.py  24 Sep     the timeline's running mean is twelve months or nothing
+    build/patch_skin_lab.py      11 Oct     two skins, Ops and Lab, switched in the header (#ops / #lab)
+    build/patch_header_stack.py  11 Oct     header controls as one block of six equal cells
+
+`scripts/probe_skin.py ORIG NEW_OPS NEW_LAB OUTDIR` checks the skins with a virtual clock: Ops must
+draw the same pixels as the unskinned deck on the map, timeline and El Niño canvases in all four
+views, and Lab must match Ops inside the planet. Build the Lab file with `--default lab`.
 
 ## The living layer
 
